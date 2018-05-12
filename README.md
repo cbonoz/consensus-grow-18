@@ -13,6 +13,40 @@ Manual work - a lot of manual effort is spent recording and piecing together his
 
 Use the Tierion API to perform delivery validation. I should be able to query on a particular item and get a linked list of that items history that is validated on Tierion and the BTC blockchain.
 
+
+### API
+
+Record an instance of an item (equivalent to a packing slip or farmers label of an item).
+<pre>
+{
+    "name": "Swiss Chard/Green", // name of the item (not necessarily unique)
+    "unit": "12 BU", // quantity or size of the item
+    "metadata": "Product of USA", // additional comments or info on this item
+    "uuid": XXXX, // uuid of the item
+    "origin": Satur Farms NY 11935"
+    "packDate": "05-08-2018"
+}
+</pre>
+
+Record receival of an item
+<pre>
+{
+    "itemUuid": XXXX, // uuid of the received item.
+    "locationUuid": XXXXX, // uuid of the receiving location
+    "latitude": XXXX, // latitude of the receiver
+    "longitude": XXX // longitude of the receiver
+    "timestamp": XXXXX // time of receipt
+}
+</pre>
+
+
+Get the history of an item
+<pre>
+{
+    "itemUuid": XXXX // uuid of the desired item.
+}
+</pre>
+
 ### Structure
 
 <ul>
