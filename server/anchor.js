@@ -54,33 +54,38 @@ const library = (function () {
 
         // Submit each hash to three randomly selected Nodes
         let proofHandles = await chp.submitHashes(hashes)
-        console.log("Submitted Proof Objects: Expand objects below to inspect.")
-        console.log(proofHandles)
+        // console.log("Submitted Proof Objects: Expand objects below to inspect.")
+        // console.log(proofHandles)
 
         // Wait for Calendar proofs to be available
         let proofs = [];
         let attempts = 0;
-        while(proofs.length == 0 && attempts < 3) {
+        while(proofs.length == 0) {
             console.log("Sleeping 12 seconds to wait for proofs to generate before doing proof table insertion");
             await new Promise(resolve => setTimeout(resolve, 12000))
             // Calendar proofs from Tierion should now be ready.
-            console.log('attempt ' + attempts + ' getProofs');
             try {
                 proofs = await chp.getProofs(proofHandles)
             } catch (err) {
                 console.log('caught error getting proofs', err);
+                attempts += 1;
+                if (attempts < 3) {
+                    console.log('retrying...')
+                } else {
+                    console.error('retry limit exceeded, cancelling proof recording');
+                    return;
+                }
             }
-            attempts += 1;
         }
 
-        console.log("Proof Objects: Expand objects below to inspect.");
-        console.log(proofs);
+        // console.log("Proof Objects: Expand objects below to inspect.");
+        // console.log(proofs.length, 'proofs loaded');
 
         const deliveryProofs = [];
         for (let i = 0; i < deliveries.length; i++) {
             const delivery = deliveries[i];
             const proofVal = proofs[i].proof;
-            console.log('proofVal',i, proofVal);
+            // console.log('proofVal',i, proofVal);
             deliveryProofs.push({
                 deliveryId: delivery.id,
                 hashValue: hashes[i],
@@ -102,7 +107,9 @@ const library = (function () {
                 // return res.status(500).json(msg);
             }
 
-            console.log('proofs inserted', data.rows);
+            const savedProofs = data.rows;
+            console.log('proofs', savedProofs);
+            console.log('Saved proofs for ', savedProofs.length, 'proofs');
             // return res.status(200).json(data);
         });
     }

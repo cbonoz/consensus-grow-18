@@ -77,7 +77,7 @@
 </nav>
 <div class="container-fluid invisible viewpoint-fadeInUp">
     <div class="map-header">
-        <h1>Optimal Job Routing Schedule:</h1>
+        <h1>Food Delivery Dashboard:</h1>
         <span id="map-header-subtitle"></span>
         Date: <span id="date-section">
         </span>
@@ -120,8 +120,8 @@
         <div class="col-6 col-md">
           <h5>API</h5>
           <ul class="list-unstyled text-small">
-            <li><a class="text-muted" href="#">Register ports</a></li>
-            <li><a class="text-muted" href="#">Existing ports</a></li>
+            <li><a class="text-muted" href="#">Add an item</a></li>
+            <li><a class="text-muted" href="#">Record a delivery</a></li>
             <li><a class="text-muted" href="#">Get the history of an item</a></li>
             <li><a class="text-muted" href="#">Optimal schedule</a></li>
           </ul>
@@ -404,14 +404,17 @@
             $("#error-text").html('');
             markers = [];
             console.log('data', data);
+            const startLocationIndex = 0;
 
-            const allRoutes = data.routes;
-            const routes = allRoutes.filter((route => route.length));
+            const deliveries = data.deliveries;
+            const items = data.items;
+            const itemIds = Object.keys(deliveries);
 
             let routeText = `<p>Format: Item #: {List of delivery locations}.<br/>'0' indicates the home truck depot.</p>`;
 
             routeText += "<ul>";
-            const startLocation = ports[startLocationIndex];
+            // choose arbitrarily the first item of the deliveries map to be the start location.
+            const startLocation = deliveries[itemIds[0]][0];
 
             markers.push(new google.maps.Marker({
                 map: map,
@@ -422,29 +425,29 @@
                 optimized: false
             }));
 
-            routes.map((route, vehicleIndex) => {
-                const flightPlanCoordinates = [];
-                flightPlanCoordinates.push({lat: startLocation.lat, lng: startLocation.lng});
-                route.map((portIndex, i) => {
-                    const currentLocation = ports[portIndex];
-                    const portName = ports[portIndex].name;
-                    // console.log('placing', portName);
+            itemIds.map((itemId, vehicleIndex) => {
+                const itemDeliveryMaps = [];
+                itemDeliveryMaps.push({lat: startLocation.lat, lng: startLocation.lng});
+                const route = deliveries[itemId];
+                route.map((currentLocation, i) => {
                     const position = {lat: currentLocation.lat, lng: currentLocation.lng};
-                    flightPlanCoordinates.push(position);
-                    const isPickup = i % 2;
+                    itemDeliveryMaps.push(position);
+                    const isPickup = i == 0;
+                    const markerName = "Delivery " + (i + 1);
                     const marker = new google.maps.Marker({
                         map: map,
                         draggable: false,
                         icon: isPickup ? icons.pickup : icons.delivery,
                         animation: firstRun ? google.maps.Animation.DROP : null,
                         position: position,
-                        title: portName,
+                        title: markerName,
                         optimized: false
                     });
+
                     markers.push(marker);
                     marker.addListener('click', toggleBounce);
                     const infowindow = new google.maps.InfoWindow({
-                        content: getMarkerInfo(vehicleIndex, portName, isPickup, i)
+                        content: getMarkerInfo(vehicleIndex, markerName, isPickup, i)
                     });
                     marker.addListener('click', function () {
                         infowindow.open(map, marker);
@@ -452,10 +455,14 @@
 
                 });
 
-                const truckRoute = `Truck ${vehicleIndex}: ${[startLocationIndex].concat(route).concat([startLocationIndex]).join(' -> ')}`;
+                function formatLocation(r) {
+                    return `(${r.lat}, ${r.lng})`;
+                }
+                const startLocationFormatted = formatLocation(startLocation);
+                const truckRoute = `Item ${vehicleIndex}: ${[startLocationFormatted].concat(route.map((r) => formatLocation(r))).concat([startLocationFormatted]).join(' -> ')}`;
                 routeText += "<li>" + truckRoute + "</li>";
                 console.log(truckRoute);
-                flightPlanCoordinates.push({lat: startLocation.lat, lng: startLocation.lng});
+                // itemDeliveryMaps.push({lat: startLocation.lat, lng: startLocation.lng});
 
                 // Define a symbol using a predefined path (an arrow)
                 // supplied by the Google Maps JavaScript API.
@@ -465,14 +472,12 @@
 
                 const color = getRandomColor();
 
-                for (var i = 0, n = flightPlanCoordinates.length; i < n; i++) {
+                for (var i = 0, n = itemDeliveryMaps.length; i < n; i++) {
 
                     var coordinates = new Array();
                     for (var j = i; j < i + 2 && j < n; j++) {
-                        coordinates[j - i] = flightPlanCoordinates[j];
+                        coordinates[j - i] = itemDeliveryMaps[j];
                     }
-
-
                     var polyline = new google.maps.Polyline({
                         path: coordinates,
                         strokeColor: color,
@@ -485,29 +490,14 @@
                         }]
                     });
                     polyline.setMap(map);
-
                 }
-                flightPath.setMap(map);
             });
 
             firstRun = false;
-            routeText += "</ul>";
-            routeText += `<br/><p>Total Distance: <b>${data.cost}km</b></p>`;
-            if (data.pickups.length > 0) {
-                routeText += `<p>Pickups: <b>${data.pickups.join('\n')}</b></p>`;
-            }
-            if (data.deliveries.length > 0) {
-                routeText += `<p>Deliveries: <b>${data.deliveries.join('\n')}</b></p>`;
-            }
+             $("#result-section").html('' + routeText);
 
-            if (unusedTrucks > 0) {
-                routeText += `<p>Optimal routing to fufill orders resulted in ${unusedTrucks} unneeded vehicles.</p>`;
-            }
-
-            $("#result-section").html('' + routeText);
-
-            const lat = ports[startLocationIndex].lat;
-            const lng = ports[startLocationIndex].lng;
+            const lat = startLocation.lat;
+            const lng = startLocation.lng;
             console.log('center', lat, lng);
 
             // Center the map at the starting node
@@ -515,6 +505,8 @@
             map.setCenter(center);
             map.setZoom(11);
             map.setMapTypeId('satellite');
+
+            $("#map-header-subtitle").html(`${itemIds.length} items active today -`)
         }
 
         const date = new Date();
@@ -525,16 +517,12 @@
 
         // TODO: fix problem where numVehicles*vehicleCapacity requiring to be > # nodes.
         const data = {
-            jobDate: jobDate,
-            startLocationId: startLocationId,
-            numVehicles: 50,
-            vehicleCapacity: 2
         };
 
 //        const url = "http://13.65.170.101:9001";
         const url = "http://localhost:9001";
 
-        function makeProofRequest(deliveries) {
+        function makeProofRequest(deliveryIds) {
             $.ajax({
                 url: `${url}/api/proofs`,
                 type: 'POST',
@@ -545,23 +533,21 @@
             });
         }
 
-        function makeRouteRequest() {
+        function makeRouteRequest(routeData) {
             console.log('makeRouteRequest');
             $.ajax({
                 url: `${url}/api/deliveries`,
-                type: 'POST',
-                data: JSON.stringify(data),
+                type: 'GET',
+                data: JSON.stringify(routeData),
                 contentType: 'application/json; charset=utf-8',
                 success: handleRouteData,
                 error: handleError
             });
         }
 
-        $("#map-header-subtitle").html(`For ${data.numVehicles} vehicles with ${data.vehicleCapacity} unit capacity`);
-
         // Refresh the map page every 10000ms.
 //        setInterval(makeRouteRequest, 10000);
-        makeRouteRequest();
+        makeRouteRequest(data);
 
     }
 </script>

@@ -82,7 +82,30 @@
                 return res.status(500).json(msg);
             }
 
-            return res.status(200).json(data.rows);
+            const deliveries = data.rows;
+            const deliveryMap = {};
+            for (let i = 0; i < deliveries.length; i++) {
+                const d = deliveries[i];
+                if (!deliveryMap.hasOwnProperty(d.itemid)) {
+                    deliveryMap[d.itemid] = [];
+                }
+                deliveryMap[d.itemid].push(d);
+            }
+
+            // console.log('deliveries', deliveries.length)
+            // console.log('deliveryMap', JSON.stringify(deliveryMap));
+
+            const query = `SELECT * from item where id in (${Object.keys(deliveryMap).join(",")})`;
+            pool.query(query, (err, data) => {
+                const result = {};
+                result.deliveries = deliveryMap;
+                const itemMap = {};
+                data.rows.map((item) => {
+                    itemMap[item.id] = item;
+                })
+                result.items = itemMap;
+                return res.status(200).json(result);
+            });
         });
     });
 
@@ -111,7 +134,6 @@
         const deliveries = body.deliveries;
 
         const values = deliveries.map((item) => {
-            console.log('item',item)
             return `(${item.itemId}, ${item.locationId}, ${item.lat}, ${item.lng}, ${item.timeMs})`;
         });
 
@@ -123,9 +145,9 @@
                 console.log(err);
                 return res.status(500).json(msg);
             }
-            console.log('delivery data', data)
+            // console.log('delivery data', data)
             const inserted = data.rows;
-            console.log('inserted', inserted.length);
+            console.log('server recorded', inserted.length, 'deliveries');
             anchor.saveDeliveries(inserted, pool);
 
             return res.status(200).json(data);
@@ -148,7 +170,7 @@
             }
 
             const inserted = data.rows;
-            console.log('inserted proofs', inserted.length);
+            console.log('server recorded', inserted.length, 'proofs');
 
             return res.status(200).json(data);
         });
