@@ -108,14 +108,14 @@
      */
     app.post('/api/deliveries/add', function (req, res, next) {
         const body = req.body;
-        const items = body.deliveries;
+        const deliveries = body.deliveries;
 
-        const values = items.map((item) => {
+        const values = deliveries.map((item) => {
             console.log('item',item)
             return `(${item.itemId}, ${item.locationId}, ${item.lat}, ${item.lng}, ${item.timeMs})`;
         });
 
-        const insertQuery = escape(`INSERT INTO delivery(itemId, locationId, lat, lng, timeMs) VALUES${values.join(',')} ON CONFLICT DO NOTHING`);
+        const insertQuery = escape(`INSERT INTO delivery(itemId, locationId, lat, lng, timeMs) VALUES${values.join(',')} ON CONFLICT DO NOTHING RETURNING *`);
         console.log('item insertQuery', insertQuery);
         pool.query(insertQuery, [], (err, data) => {
             if (err) {
@@ -123,6 +123,32 @@
                 console.log(err);
                 return res.status(500).json(msg);
             }
+            console.log('delivery data', data)
+            const inserted = data.rows;
+            console.log('inserted', inserted.length);
+            anchor.saveDeliveries(inserted, pool);
+
+            return res.status(200).json(data);
+        });
+    });
+
+    app.post('/api/proofs', function (req, res, next) {
+        const body = req.body;
+        const deliveryIds = body.deliveryIds;
+
+        const valueString = deliveryIds.join(',');
+
+        const selectQuery = `SELECT * from proofs where deliveryId in (${valueString}) RETURNING *`;
+        console.log('selectQuery', selectQuery);
+        pool.query(selectQuery, [], (err, data) => {
+            if (err) {
+                const msg = JSON.stringify(err);
+                console.log(err);
+                return res.status(500).json(msg);
+            }
+
+            const inserted = data.rows;
+            console.log('inserted proofs', inserted.length);
 
             return res.status(200).json(data);
         });
@@ -142,7 +168,7 @@
             return `('${item.name}', '${item.unit}', '${item.metadata}', '${item.uuid}', '${item.origin}', '${item.packDate}')`;
         });
 
-        const insertQuery = escape(`INSERT INTO item(name, unit, metadata, uuid, origin, packDate) VALUES${values.join(',')} ON CONFLICT DO NOTHING`);
+        const insertQuery = escape(`INSERT INTO item(name, unit, metadata, uuid, origin, packDate) VALUES${values.join(',')} ON CONFLICT DO NOTHING  RETURNING *`);
         // console.log('item insertQuery', insertQuery);
         pool.query(insertQuery, [], (err, data) => {
             if (err) {

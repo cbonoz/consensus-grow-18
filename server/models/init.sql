@@ -25,7 +25,8 @@ CREATE TABLE delivery (
 );
 
 CREATE TABLE proof (
+    ID SERIAL PRIMARY KEY,
     deliveryId SERIAL REFERENCES delivery(ID),
     hashValue VARCHAR, -- hashed delivery .
-    proof VARCHAR -- proof of hashed delivery integrity.
+    proofValue VARCHAR -- proof of hashed delivery integrity.
 );

@@ -3,6 +3,8 @@
  */
 const library = (function () {
 
+    const chp = require('chainpoint-client');
+    const cpb = require('chainpoint-binary')
     const hash = require('object-hash');
     const geolib = require('geolib');
     const BASE_URL = "localhost:9001";
@@ -30,14 +32,25 @@ const library = (function () {
         return (date.getMonth() + 1) + '-' + date.getDate() + '-' + date.getFullYear();
     }
 
-    async function saveDelivery(delivery, pool) {
-        const hashValue = hash(delivery);
+    async function saveDeliveries(deliveries, pool) {
         // A few sample SHA-256 proofs to anchor
         // const hashes = ['1d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
         //     '2d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
         //     '3d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a'
         // ]
-        const hashes = [hashValue];
+        if (!deliveries || !pool) {
+            throw 'deliveries or sql pool was undefined'
+            return;
+        }
+
+        if (deliveries.length > 80)  {
+            // not the max for getProofs is 250, using 80*3 as a approx bound
+            throw 'cannot save more than 80 deliveries at a time, attempted: ' + deliveries.length
+        }
+
+        const hashes = deliveries.map((d) => {
+            return hash(d);
+        });
 
         // Submit each hash to three randomly selected Nodes
         let proofHandles = await chp.submitHashes(hashes)
@@ -45,28 +58,51 @@ const library = (function () {
         console.log(proofHandles)
 
         // Wait for Calendar proofs to be available
-        console.log("Sleeping 12 seconds to wait for proofs to generate...")
-        await new Promise(resolve => setTimeout(resolve, 12000))
+        let proofs = [];
+        let attempts = 0;
+        while(proofs.length == 0 && attempts < 3) {
+            console.log("Sleeping 12 seconds to wait for proofs to generate before doing proof table insertion");
+            await new Promise(resolve => setTimeout(resolve, 12000))
+            // Calendar proofs from Tierion should now be ready.
+            console.log('attempt ' + attempts + ' getProofs');
+            try {
+                proofs = await chp.getProofs(proofHandles)
+            } catch (err) {
+                console.log('caught error getting proofs', err);
+            }
+            attempts += 1;
+        }
 
-        // Calendar proofs from Tierion should now be ready.
-        let proofs = await chp.getProofs(proofHandles)
         console.log("Proof Objects: Expand objects below to inspect.");
         console.log(proofs);
 
+        const deliveryProofs = [];
+        for (let i = 0; i < deliveries.length; i++) {
+            const delivery = deliveries[i];
+            const proofVal = proofs[i].proof;
+            console.log('proofVal',i, proofVal);
+            deliveryProofs.push({
+                deliveryId: delivery.id,
+                hashValue: hashes[i],
+                proofValue: proofVal
+            });
+        }
+
         // Should be one generated proof.
-        const proof = proofs[0];
-        const deliveryId = delivery.id;
-        // Store the calendar promise in the proofs DB.
-        const insertQuery = `INSERT INTO proof() VALUES(${deliveryId}, '${hashValue}', '${proof}')`;
+        const values = deliveryProofs.map((item) => {
+            return `(${item.deliveryId}, '${item.hashValue}', '${item.proofValue}')`;
+        });
+
+        const insertQuery = `INSERT INTO proof(deliveryId, hashValue, proofValue) VALUES${values.join(',')} ON CONFLICT DO NOTHING RETURNING *`;
         console.log('proof insertQuery', insertQuery);
         pool.query(insertQuery, [], (err, data) => {
             if (err) {
                 const msg = JSON.stringify(err);
-                console.log('error inserting proof', err);
-                // TODO: add retry in case of error.
+                console.log(err);
                 // return res.status(500).json(msg);
             }
 
+            console.log('proofs inserted', data.rows);
             // return res.status(200).json(data);
         });
     }
@@ -75,6 +111,7 @@ const library = (function () {
         matrix: matrix,
         getDistance: getDistance,
         getToday: getToday,
+        saveDeliveries: saveDeliveries
     };
 
 })();

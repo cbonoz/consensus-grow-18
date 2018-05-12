@@ -374,7 +374,7 @@
             }
         }
 
-        const startPortId = 1;
+        const startLocationId = 1;
         var markers;
 
         var firstRun = true;
@@ -397,46 +397,39 @@
         }
 
         function getMarkerInfo(truck, portName, pickup, stopNumber) {
-            return `<div id="content"><div id="siteNotice"></div><h1 id="firstHeading" class="firstHeading">${portName}</h1><div id="bodyContent"><p><b>Port Name: ${portName}</b></p><p><b>Route ${truck}</b></p><p>Stop Type: ${pickup ? 'Pickup' : 'Deliver'}, Stop Number ${stopNumber}</p></div></div>`;
+            return `<div id="content"><div id="siteNotice"></div><h1 id="firstHeading" class="firstHeading">${portName}</h1><div id="bodyContent"><p><b>Location Name: ${portName}</b></p><p><b>Route ${truck}</b></p><p>Stop Type: ${pickup ? 'Pickup' : 'Deliver'}, Stop Number ${stopNumber}</p></div></div>`;
         }
 
         function handleRouteData(data) {
             $("#error-text").html('');
             markers = [];
             console.log('data', data);
-            // TODO: generate polylines from the schedule data on the map
-            const ports = data.ports;
-
-            const startPortIndex = ports.findIndex((port) => {
-                return port.id === startPortId
-            });
 
             const allRoutes = data.routes;
             const routes = allRoutes.filter((route => route.length));
-            const unusedTrucks = allRoutes.length - routes.length;
 
-            let routeText = `<p>Format: Truck #: {List of locations to visit}.<br/>'0' indicates the home truck depot.</p>`;
+            let routeText = `<p>Format: Item #: {List of delivery locations}.<br/>'0' indicates the home truck depot.</p>`;
 
             routeText += "<ul>";
-            const startPort = ports[startPortIndex];
+            const startLocation = ports[startLocationIndex];
 
             markers.push(new google.maps.Marker({
                 map: map,
                 draggable: false,
                 icon: icons.start,
                 animation: firstRun ? google.maps.Animation.DROP : null,
-                position: {lat: startPort.lat, lng: startPort.lng},
+                position: {lat: startLocation.lat, lng: startLocation.lng},
                 optimized: false
             }));
 
             routes.map((route, vehicleIndex) => {
                 const flightPlanCoordinates = [];
-                flightPlanCoordinates.push({lat: startPort.lat, lng: startPort.lng});
+                flightPlanCoordinates.push({lat: startLocation.lat, lng: startLocation.lng});
                 route.map((portIndex, i) => {
-                    const currentPort = ports[portIndex];
+                    const currentLocation = ports[portIndex];
                     const portName = ports[portIndex].name;
                     // console.log('placing', portName);
-                    const position = {lat: currentPort.lat, lng: currentPort.lng};
+                    const position = {lat: currentLocation.lat, lng: currentLocation.lng};
                     flightPlanCoordinates.push(position);
                     const isPickup = i % 2;
                     const marker = new google.maps.Marker({
@@ -459,10 +452,10 @@
 
                 });
 
-                const truckRoute = `Truck ${vehicleIndex}: ${[startPortIndex].concat(route).concat([startPortIndex]).join(' -> ')}`;
+                const truckRoute = `Truck ${vehicleIndex}: ${[startLocationIndex].concat(route).concat([startLocationIndex]).join(' -> ')}`;
                 routeText += "<li>" + truckRoute + "</li>";
                 console.log(truckRoute);
-                flightPlanCoordinates.push({lat: startPort.lat, lng: startPort.lng});
+                flightPlanCoordinates.push({lat: startLocation.lat, lng: startLocation.lng});
 
                 // Define a symbol using a predefined path (an arrow)
                 // supplied by the Google Maps JavaScript API.
@@ -492,22 +485,9 @@
                         }]
                     });
                     polyline.setMap(map);
-//                    polylines.push(polyline);
 
                 }
-//
-//                const flightPath = new google.maps.Polyline({
-//                    path: flightPlanCoordinates,
-//                    geodesic: true,
-//                    icons: [{
-//                        icon: lineSymbol,
-//                        offset: '100%'
-//                    }],
-//                    strokeColor: getRandomColor(), // Use variable color for each vehicle on the map.
-//                    strokeOpacity: 1.0,
-//                    strokeWeight: 3
-//                });
-//                flightPath.setMap(map);
+                flightPath.setMap(map);
             });
 
             firstRun = false;
@@ -526,8 +506,8 @@
 
             $("#result-section").html('' + routeText);
 
-            const lat = ports[startPortIndex].lat;
-            const lng = ports[startPortIndex].lng;
+            const lat = ports[startLocationIndex].lat;
+            const lng = ports[startLocationIndex].lng;
             console.log('center', lat, lng);
 
             // Center the map at the starting node
@@ -546,7 +526,7 @@
         // TODO: fix problem where numVehicles*vehicleCapacity requiring to be > # nodes.
         const data = {
             jobDate: jobDate,
-            startPortId: startPortId,
+            startLocationId: startLocationId,
             numVehicles: 50,
             vehicleCapacity: 2
         };
@@ -554,10 +534,21 @@
 //        const url = "http://13.65.170.101:9001";
         const url = "http://localhost:9001";
 
+        function makeProofRequest(deliveries) {
+            $.ajax({
+                url: `${url}/api/proofs`,
+                type: 'POST',
+                data: JSON.stringify(data),
+                contentType: 'application/json; charset=utf-8',
+                success: handleProofData,
+                error: handleError
+            });
+        }
+
         function makeRouteRequest() {
             console.log('makeRouteRequest');
             $.ajax({
-                url: `${url}/api/schedule`,
+                url: `${url}/api/deliveries`,
                 type: 'POST',
                 data: JSON.stringify(data),
                 contentType: 'application/json; charset=utf-8',
