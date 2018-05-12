@@ -1,30 +1,23 @@
 AnchorSupply
 ---
 
-<b>Team Brontosaurus:</b>
-<br/>
-
-* Chris Buonocore (back end / maps)
-* Ed Arenberg (iOS)
-* Brandon In (research / back end)
-* Sarah Han (UI / UX / front end)
-
 <b>Check the `README.md` files in each subfolder for more information.</b>
 
 ### Concept:
 
-90 percent of short-haul trucking from maritime ports in the US are performed by individual truckers or small fleets of less than 6 vehicles. They are at the mercy of brokers who charge 25-35% fees, and dole out single-transaction jobs on an unknown schedule. This causes most trucks to return to the ports empty, and idle needlessly waiting for jobs.
+Record GrowNYC supply chain transactions on the blockchain and have them visualized on a google map in real time. Use chainpoint proofs to prove that a particular item/product was at a location at a given point in time. (GrowNYC, Chainpoint)
 
-AnchorSupply is a new service that eliminates the broker, and implements a routing algorithm that emphasizes dual-transaction routes - delivery from port to hub followed by a hub pickup and return to port. Drivers will have more full loads and daily trips, ports will be able to transact more containers per day, and port pollution will be reduced. Routing is performed regularly to self-heal from truck breakdowns or driver issues.
+Biggest problems:
+Traceability - being able to answer questions such as where did this case of strawberries come from.
+Manual work - a lot of manual effort is spent recording and piecing together history for particular items.
 
-View the pitch deck here: <a href="https://docs.google.com/presentation/d/1rC6jKaGLiJJWgyQHkIo4bEdZeTz1ex22JDnd4DLX3EQ/edit?usp=sharing">Pitch Deck</a>
+Use the Tierion API to perform delivery validation. I should be able to query on a particular item and get a linked list of that items history that is validated on Tierion and the BTC blockchain.
 
 ### Structure
 
 <ul>
 <li><b>/server</b>: Server and api for submitting scheduling data.</li>
-<li><b>/AnchorSupplyApp</b>: Mobile app designed for providing schedule/ information specific to each driver.</li>
-<li><b>/AnchorSupplyWeb</b>: Client side reactjs website</li>
+<li><b>/client</b>: Client side reactjs website</li>
 <li><b>/screenshots</b>: Screenshots of app</b></li>  
 </ul>
 
