@@ -70,6 +70,21 @@
         });
     });
 
+     /*
+     * Returns registered items.
+     */
+    app.get('/api/deliveries', (err, res) => {
+        const itemQuery = `SELECT * from delivery`;
+        pool.query(itemQuery, (err, data) => {
+            if (err) {
+                const msg = JSON.stringify(err);
+                return res.status(500).json(msg);
+            }
+
+            return res.status(200).json(data.rows);
+        });
+    });
+
     app.get('/api/item/history/:itemId', (err, res) => {
         const itemId = req.params.itemId;
         const itemQuery = `SELECT * from delivery where itemId=${itemId}`;
@@ -85,9 +100,37 @@
     })
 
     /*
+     * Register new deliveries with the AnchorSupply DB.
+     * {
+     *  deliveries: [ {itemId, locationId, latitude, longitude, timeMs}, ... ]
+     * }
+     */
+    app.post('/api/delivieries/add', function (req, res, next) {
+        const body = req.body;
+        const items = body.items;
+
+        const values = items.map((item) => {
+            return `(${item.itemId}, ${item.locationId}, ${item.lat}, ${item.lng}, ${item.timeMs})`;
+        });
+
+        const insertQuery = `INSERT INTO delivery(itemId, locationId, lat, lng, timeMs) VALUES${values.join(',')} ON CONFLICT DO NOTHING`;
+        // console.log('item insertQuery', insertQuery);
+        pool.query(insertQuery, [], (err, data) => {
+            if (err) {
+                const msg = JSON.stringify(err);
+                console.log(err);
+                return res.status(500).json(msg);
+            }
+
+            return res.status(200).json(data);
+        });
+    });
+
+
+    /*
      * Register new items with the AnchorSupply DB.
      * {
-     *  items: [ {name, latitude, longitude}, ... ]
+     *  items: [ {name, unit, metdata, uuid, origin, packDate}, ... ]
      * }
      */
     app.post('/api/items/add', function (req, res, next) {
@@ -95,7 +138,7 @@
         const items = body.items;
 
         const values = items.map((item) => {
-            return `('${item.name}', ${item.lat}, ${item.lng})`;
+            return `('${item.name}', '${item.unit}', '${item.metadata}', '${item.uuid}', '${item.origin}', '${item.packDate}')`;
         });
 
         const insertQuery = `INSERT INTO item(name, lat, lng) VALUES${values.join(',')} ON CONFLICT DO NOTHING`;

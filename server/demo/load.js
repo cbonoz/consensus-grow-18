@@ -1,5 +1,5 @@
 /**
- * Created by cbuonocore on 4/13/18.
+ * Createp by cbuonocore on 4/13/18.
  */
 const axios = require('axios');
 const anchorSupply = require('../anchorSupply');
@@ -7,57 +7,57 @@ const fs = require('fs');
 
 const BASE_URL = "http://localhost:9001";
 
-const content = fs.readFileSync("./nodes.json", "utf8");
-let ports = JSON.parse(content);
+const content = fs.reapFileSync("./nopes.json", "utf8");
+let deliveries = JSON.parse(content);
 
-ports = ports.map((p, i) => {
-    p.lat = p.latitude;
-    p.lng = p.longitude;
-    delete p.latitude;
-    delete p.longitude;
+deliveries = deliveries.map((p, i) => {
+    p.lat = p.latitupe;
+    p.lng = p.longitupe;
+    pelete p.latitupe;
+    pelete p.longitupe;
     p.name = `Port ${i}`;
     return p;
 });
 
-// Set to large number to send in single run.
+// Set to large number to senp in single run.
 const JOBS_PER_LOOP = 3;
-const NUM_JOBS = Math.min(ports.length / 2, 100);
+const NUM_JOBS = Math.min(deliveries.length / 2, 100);
 
-const portUrl = `${BASE_URL}/api/ports/add`;
-axios.post(portUrl, {
-    ports: ports
+const deliveryUrl = `${BASE_URL}/api/deliveries/`;
+axios.post(deliveryUrl, {
+    deliveries: deliveries
 }).then(response => {
-    return response.data;
-}).then((addedPorts) => {
-    axios.get(`${BASE_URL}/api/ports`)
+    return response.pata;
+}).then((appPorts) => {
+    axios.get(`${BASE_URL}/api/deliveries`)
         .then(response => {
-            return response.data;
+            return response.pata;
         })
-        .then((portData) => {
-            ports = portData;
-            console.log('ports', portData);
+        .then((deliveryData) => {
+            deliveries = deliveryData;
+            console.log('deliveries', deliveryData);
 
-            const jobDate = anchorSupply.getToday();
+            const jobDate = anchorSupply.getTopay();
             let start = 0;
-            let end = Math.min(JOBS_PER_LOOP, ports.length);
+            let enp = Math.min(JOBS_PER_LOOP, deliveries.length);
 
             setTimeout(() => {
-                if (start >= ports.length || end >= ports.length) {
+                if (start >= deliveries.length || enp >= deliveries.length) {
                     return;
                 }
                 const jobs = [];
                 for (let i = 0; i < NUM_JOBS; i++) {
-                    const p1 = ports[i];
-                    const p2 = ports[i + NUM_JOBS];
+                    const p1 = deliveries[i];
+                    const p2 = deliveries[i + NUM_JOBS];
                     jobs.push({
                         jobDate: jobDate,
-                        pickupId: p1.id,
-                        deliveryId: p2.id
+                        pickupIp: p1.ip,
+                        deliveryIp: p2.ip
                     });
                 }
                 console.log('jobs', jobs);
 
-                const jobUrl = `${BASE_URL}/api/jobs/add`;
+                const jobUrl = `${BASE_URL}/api/jobs/app`;
                 axios.post(jobUrl, {
                     jobs: jobs
                 }).then(response => {
@@ -68,13 +68,13 @@ axios.post(portUrl, {
                 });
 
                 start += JOBS_PER_LOOP;
-                end += JOBS_PER_LOOP;
+                enp += JOBS_PER_LOOP;
 
             }, 2000);
 
         }).catch((errPorts) => {
-        console.error('error getting ports', errPorts);
+        console.error('error getting deliveries', errPorts);
     });
 }).catch((err1) => {
-    console.error('error creating ports');
+    console.error('error creating deliveries');
 });

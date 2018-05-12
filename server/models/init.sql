@@ -21,7 +21,7 @@ CREATE TABLE delivery (
   locationId SERIAL,
   lat float(7),
   lng float(7),
-  timestamp bigint
+  timeMs bigint
   PRIMARY KEY (itemId, locationid)
 );
 

@@ -16,27 +16,35 @@ Use the Tierion API to perform delivery validation. I should be able to query on
 
 ### API
 
-Record an instance of an item (equivalent to a packing slip or farmers label of an item).
+Record instance of item(s), equivalent to a packing slip or farmers label of an item.
 <pre>
-{
-    "name": "Swiss Chard/Green", // name of the item (not necessarily unique)
-    "unit": "12 BU", // quantity or size of the item
-    "metadata": "Product of USA", // additional comments or info on this item
-    "uuid": XXXX, // uuid of the item
-    "origin": Satur Farms NY 11935"
-    "packDate": "05-08-2018"
-}
+POST /api/items/add
+[
+    {
+        "name": "Swiss Chard/Green", // name of the item (not necessarily unique)
+        "unit": "12 BU", // quantity or size of the item
+        "metadata": "Product of USA", // additional comments or info on this item
+        "uuid": XXXX, // uuid of the item
+        "origin": Satur Farms NY 11935"
+        "packDate": "05-08-2018"
+    },
+    ...
+]
 </pre>
 
-Record delivery of an item
+Record deliveries of item(s)
 <pre>
-{
-    "itemUuid": XXXX, // uuid of the received item.
-    "locationUuid": XXXXX, // uuid of the receiving location
-    "latitude": XXXX, // latitude of the receiver
-    "longitude": XXX // longitude of the receiver
-    "timestamp": XXXXX // time of delivery
-}
+POST /api/deliveries/add
+[
+    {
+        "itemId": XXXX, // uuid of the received item.
+        "locationId": XXXXX, // uuid of the receiving location
+        "lat": XXXX, // latitude of the receiver
+        "lng": XXX // longitude of the receiver
+        "timeMs": XXXXX // time of delivery
+    },
+    ...
+]
 </pre>
 
 
@@ -53,7 +61,7 @@ Return all registered items
 <pre>
 GET /api/items
 {
-    "itemUuid": XXXX // uuid of the desired item.
+    "itemId": XXXX // uuid of the desired item.
 }
 </pre>
 
