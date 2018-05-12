@@ -5,19 +5,24 @@
 CREATE DATABASE anchor;
 \c anchor;
 
--- CREATE TABLE port (
---   ID SERIAL PRIMARY KEY,
---   name VARCHAR(64) UNIQUE,
---   lat float(7),
---   lng float(7)
--- );
 
--- CREATE TABLE job (
---   pickupId  SERIAL REFERENCES port(ID),
---   deliveryId SERIAL REFERENCES port(ID),
---   jobDate VARCHAR(64),
---   PRIMARY KEY (pickupId, deliveryId, jobDate)
--- );
+CREATE TABLE item (
+  ID SERIAL PRIMARY KEY,
+  name VARCHAR(64),
+  metadata VARCHAR,
+  uuid VARCHAR,
+  origin VARCHAR,
+  packDate VARCHAR
+);
+
+CREATE TABLE receipt (
+  itemId  SERIAL REFERENCES port(ID),
+  locationId SERIAL REFERENCES port(ID),
+  lat float(7),
+  lng float(7),
+  timestamp bigint
+  PRIMARY KEY (itemId, locationid)
+);
 
 -- CREATE TABLE person (
 --     ID SERIAL PRIMARY KEY,
