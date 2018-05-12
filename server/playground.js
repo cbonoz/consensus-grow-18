@@ -1,88 +1,29 @@
-/**
- * Created by cbuonocore on 4/14/18.
- * https://github.com/mapbox/node-or-tools/blob/master/API.md#vrp
- */
-const assert = require("assert"); // node.js core testing module.
-const anchorSupply = require('./anchorSupply');
-const fs = require('fs');
-const util = require('util');
-const _ = require('lodash');
+const chp = require('chainpoint-client')
 
-const INF = 100000000;
+async function runIt () {
+  // A few sample SHA-256 proofs to anchor
+  let hashes = ['1d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
+                '2d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
+                '3d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a']
 
-const content = fs.readFileSync("demo/nodes.json", "utf8");
-let locations = JSON.parse(content);
-locations = locations.splice(0, 25);
-// const locations = [
-    // [13.414649963378906, 52.522905940278065],
-    // [13.363409042358397, 52.549218541178455],
-    // [13.394737243652344, 52.55062769982075],
-    // [13.426065444946289, 52.54640008814808],
-    // [13.375682830810547, 52.536534077147714],
-    // [13.39010238647461, 52.546191306649376],
-    // [13.351736068725584, 52.50754964045259],
-    // [13.418254852294922, 52.52927670688215],
-// ];
+  // Submit each hash to three randomly selected Nodes
+  let proofHandles = await chp.submitHashes(hashes)
+  console.log("Submitted Proof Objects: Expand objects below to inspect.")
+  console.log(proofHandles)
 
+  // Wait for Calendar proofs to be available
+  console.log("Sleeping 12 seconds to wait for proofs to generate...")
+  await new Promise(resolve => setTimeout(resolve, 12000))
 
-console.log('locations', locations.length);
+  // Retrieve a Calendar proof for each hash that was submitted
+  let proofs = await chp.getProofs(proofHandles)
+  console.log("Proof Objects: Expand objects below to inspect.")
+  console.log(proofs)
 
-// Starting location (node) for vehicle.
-const depotIndex = 0;
-const computeTimeLimit = 10000;
-const numVehicles = 10;
-const vehicleCapacity = 2;
-const n = locations.length;
-
-// 9am -- 5pm
-var dayStarts = 0;
-var dayEnds = 8 * 60 * 60;
-
-const costs = anchorSupply.getCostMatrix(locations, anchorSupply.getDistance);
-
-// Dummy durations, no service times included
-var durations = costs;
-
-// Dummy time windows for the full day
-var timeWindows = new Array(durations.length);
-
-for (var at = 0; at < durations.length; ++at) {
-    timeWindows[at] = [dayStarts, dayEnds];
+  // Verify every anchor in every Calendar proof
+  let verifiedProofs = await chp.verifyProofs(proofs)
+  console.log("Verified Proof Objects: Expand objects below to inspect.")
+  console.log(verifiedProofs)
 }
 
-var demands = anchorSupply.createDemandMatrix(n, depotIndex);
-
-// No route locks per vehicle, let solver decide freely
-var routeLocks = anchorSupply.createArrayList(numVehicles, []);
-
-
-var solverOpts = {
-    numNodes: durations.length,
-    costs: costs,
-    durations: durations,
-    timeWindows: timeWindows,
-    demands: demands
-};
-
-var timeHorizon = INF; //dayEnds - dayStarts;
-
-var searchOpts = {
-    computeTimeLimit: computeTimeLimit,
-    numVehicles: numVehicles,
-    depotNode: depotIndex,
-    timeHorizon: timeHorizon,
-    vehicleCapacity: vehicleCapacity,
-    routeLocks: routeLocks,
-    pickups: [],
-    deliveries: []
-};
-
-// console.log(solverOpts, searchOpts);
-//
-anchorSupply.solveVRP(solverOpts, searchOpts, (err, solution) => {
-    if (err) {
-        console.error(err);
-        return;
-    }
-    console.log('solution', JSON.stringify(solution));
-});
+runIt()

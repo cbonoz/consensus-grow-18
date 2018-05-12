@@ -104,20 +104,17 @@
 
   <span class="token title">Definition:</span>
   <span class="token code-body">
-  POST /api/item/add
+  POST /api/items/add
   </span>
 
   <span class="token title">Example Request Body: </span>
 
 <span class="token code-body">
-{
-    "name": "Swiss Chard/Green", // name of the item (not necessarily unique)
-    "unit": "12 BU", // quantity or size of the item
-    "metadata": "Product of USA", // additional comments or info on this item
-    "uuid": XXXX, // uuid of the item
-    "origin": Satur Farms NY 11935"
-    "packDate": "05-08-2018"
-}
+  <pre>
+ {"items" :[ { "name": "Swiss Chard/Green", // name of the item (not necessarily unique) "unit": "12 BU", // quantity or
+size of the item "metadata": "Product of USA", // additional comments or info on this item "uuid": XXXX, // uuid of the item
+"origin": Satur Farms NY 11935" "packDate": "05-08-2018" }, ... ] }
+</pre>
 </span>
                             <span class="token title">
   Example Response: </span>
@@ -158,7 +155,7 @@
   <span class="token title">Example Response:</span>
   <span class="token comment">// Successful DB response.</span>
   <span class="token code-body">
-      Returns a list of stimming entities.
+    Recored a delivery for a particular item id - validated by ChainPoint.
   {
       "itemUuid": XXXX, // uuid of the received item.
       "locationUuid": XXXXX, // uuid of the receiving location
@@ -178,21 +175,21 @@
                 <pre>
   <span class="token description">
   ===
-      Get Accelerometer and Gyroscope Data
+    Get Validated Supply chain history for item.
   ===</span>
 
   <span class="token title">Definition:</span>
 
   <span class="token code-body">
-  GET /api/item/history?itemId={itemId}
+  GET /api/item/history/:itemId
   </span>
 
   <span class="token title">Example Response:</span>
   <span class="token comment">// Successful DB response.</span>
 <span class="token code-body">
-{
-    "itemUuid": XXXX // uuid of the desired item.
-}
+[
+  ...list of deliveries for the particular item id.
+]
 </span>
 
                 <!-- end create new jobs -->

@@ -42,6 +42,16 @@ Record delivery of an item
 
 Get the history of an item
 <pre>
+GET /api/item/history
+{
+    "itemId": XXXX // uuid of the desired item.
+}
+</pre>
+
+
+Return all registered items
+<pre>
+GET /api/items
 {
     "itemUuid": XXXX // uuid of the desired item.
 }

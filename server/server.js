@@ -28,7 +28,7 @@
     const fs = require('fs');
     const http = require('http');
     const {Pool, Client} = require('pg');
-    const anchor = require('./anchor');
+    const anchorSupply = require('./anchorSupply');
 
     /*******
      * SETUP
@@ -56,11 +56,11 @@
     });
 
     /*
-     * Returns registered ports.
+     * Returns registered items.
      */
-    app.get('/api/ports', (err, res) => {
-        const portQuery = `SELECT * from port`;
-        pool.query(portQuery, (err, data) => {
+    app.get('/api/items', (err, res) => {
+        const itemQuery = `SELECT * from item`;
+        pool.query(itemQuery, (err, data) => {
             if (err) {
                 const msg = JSON.stringify(err);
                 return res.status(500).json(msg);
@@ -70,21 +70,36 @@
         });
     });
 
+    app.get('/api/item/history/:itemId', (err, res) => {
+        const itemId = req.params.itemId;
+        const itemQuery = `SELECT * from delivery where itemId=${itemId}`;
+        console.log(itemQuery);
+        pool.query(itemQuery, (err, data) => {
+            if (err) {
+                const msg = JSON.stringify(err);
+                return res.status(500).json(msg);
+            }
+
+            return res.status(200).json(data.rows);
+        });
+    })
+
     /*
-     * Register new ports with the AnchorSupply DB.
+     * Register new items with the AnchorSupply DB.
      * {
-     *  ports: [ {name, latitude, longitude}, ... ]
+     *  items: [ {name, latitude, longitude}, ... ]
      * }
      */
-    app.post('/api/ports/add', function (req, res, next) {
+    app.post('/api/items/add', function (req, res, next) {
         const body = req.body;
-        const ports = body.ports;
+        const items = body.items;
 
-        const values = ports.map((port) => {
-            return `('${port.name}', ${port.lat}, ${port.lng})`;
+        const values = items.map((item) => {
+            return `('${item.name}', ${item.lat}, ${item.lng})`;
         });
-        const insertQuery = `INSERT INTO port(name, lat, lng) VALUES${values.join(',')} ON CONFLICT DO NOTHING`;
-        // console.log('port insertQuery', insertQuery);
+
+        const insertQuery = `INSERT INTO item(name, lat, lng) VALUES${values.join(',')} ON CONFLICT DO NOTHING`;
+        // console.log('item insertQuery', insertQuery);
         pool.query(insertQuery, [], (err, data) => {
             if (err) {
                 const msg = JSON.stringify(err);
@@ -96,64 +111,7 @@
         });
     });
 
-
-    /**
-     * Register a new person
-     * {
-     *  person: [ {pickupId, deliveryId, jobDate} ... ]
-     * }
-     */
-    app.post('/api/register', function (req, res, next) {
-        const body = req.body;
-        const name = body.name;
-        const email = body.email;
-        if (email === undefined || email === "") {
-            return res.status(500).json("email must be defined");
-        }
-
-        if (name === undefined || name === "") {
-            return res.status(500).json("name must be defined");
-        }
-
-        const insertQuery = `INSERT INTO person(name, email) VALUES('${name}', '${email}')`;
-        console.log('job insertQuery', insertQuery);
-
-        pool.query(insertQuery, (err, jobData) => {
-            if (err) {
-                const msg = JSON.stringify(err);
-                res.status(500).json(err);
-            }
-            return res.status(200).json(jobData);
-        });
-    });
-
-
-    /**
-     * Add the jobs to the db.
-     * {
-     *  jobs: [ {pickupId, deliveryId, jobDate} ... ]
-     * }
-     */
-    app.post('/api/jobs/add', function (req, res, next) {
-        const body = req.body;
-        const jobs = body.jobs;
-
-        const values = jobs.map((job) => {
-            return `(${job.pickupId}, ${job.deliveryId}, '${job.jobDate}')`;
-        });
-        const insertQuery = `INSERT INTO job(pickupId, deliveryId, jobDate) VALUES${values.join(',')} ON CONFLICT DO NOTHING`;
-        console.log('job insertQuery', insertQuery);
-
-        pool.query(insertQuery, (err, jobData) => {
-            if (err) {
-                const msg = JSON.stringify(err);
-                res.status(500).json(err);
-            }
-            return res.status(200).json(jobData);
-        });
-    });
-
     server.listen(PORT, () => {
-        console.log('Express server listening on localhost port: ' + PORT);
+        console.log('Express server listening on localhost item: ' + PORT);
     });
 }());

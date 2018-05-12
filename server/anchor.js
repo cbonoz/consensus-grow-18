@@ -3,9 +3,8 @@
  */
 const library = (function () {
 
+    const hash = require('object-hash');
     const geolib = require('geolib');
-    // const geoLib = require('geo-lib');
-    const ortools = require('node_or_tools');
     const BASE_URL = "localhost:9001";
 
     // Returns the arc distance between two lat/lng pairs in kilometers.
@@ -20,7 +19,7 @@ const library = (function () {
 
     function matrix(m, n, fillValue) {
         const result = [];
-        for(let i = 0; i < n; i++) {
+        for (let i = 0; i < n; i++) {
             result.push(new Array(m).fill(fillValue));
         }
         return result;
@@ -31,70 +30,52 @@ const library = (function () {
         return (date.getMonth() + 1) + '-' + date.getDate() + '-' + date.getFullYear();
     }
 
-    function createDemandMatrix(n, startNodeIndex) {
-        const m = matrix(n, n, 1);
-        for (let i = 0; i < n; i++) {
-            m[startNodeIndex][i] = 0;
-        }
-        return m;
-    }
+    async function saveDelivery(delivery, pool) {
+        const hashValue = hash(delivery);
+        // A few sample SHA-256 proofs to anchor
+        // const hashes = ['1d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
+        //     '2d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a',
+        //     '3d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a'
+        // ]
+        const hashes = [hashValue];
 
-    function createArrayList(n, val) {
-        const result = [];
-        for (let i = 0; i < n; i++) {
-            if (val) {
-                result.push(val);
-            } else {
-                result.push([]);
+        // Submit each hash to three randomly selected Nodes
+        let proofHandles = await chp.submitHashes(hashes)
+        console.log("Submitted Proof Objects: Expand objects below to inspect.")
+        console.log(proofHandles)
+
+        // Wait for Calendar proofs to be available
+        console.log("Sleeping 12 seconds to wait for proofs to generate...")
+        await new Promise(resolve => setTimeout(resolve, 12000))
+
+        // Calendar proofs from Tierion should now be ready.
+        let proofs = await chp.getProofs(proofHandles)
+        console.log("Proof Objects: Expand objects below to inspect.");
+        console.log(proofs);
+
+        // Should be one generated proof.
+        const proof = proofs[0];
+        const deliveryId = delivery.id;
+        // Store the calendar promise in the proofs DB.
+        const insertQuery = `INSERT INTO proof() VALUES(${deliveryId}, '${hashValue}', '${proof}')`;
+        console.log('proof insertQuery', insertQuery);
+        pool.query(insertQuery, [], (err, data) => {
+            if (err) {
+                const msg = JSON.stringify(err);
+                console.log('error inserting proof', err);
+                // TODO: add retry in case of error.
+                // return res.status(500).json(msg);
             }
-        }
-        return result;
-    }
 
-    /**
-     * Multi-vehicle node visit optimization
-     * @param vrpSolverOpts options for solving port vrp.
-     * @param vrpSearchOpts options for searching port vrp solution.
-     * @param cb: (err, solution) => { ... }
-     */
-    function solveVRP(vrpSolverOpts, vrpSearchOpts, cb) {
-        const VRP = new ortools.VRP(vrpSolverOpts);
-        VRP.Solve(vrpSearchOpts, cb);
-    }
-
-    /**
-     * Single-vehicle node visit optimization
-     * @param tspSolverOpts options for solving port tsp.
-     * @param tspSearchOpts options for searching port tsp.
-     * @param cb: (err, solution) => { ... }
-     */
-    function solveTSP(tspSolverOpts, tspSearchOpts, cb) {
-        const TSP = new ortools.TSP(tspSolverOpts);
-        TSP.Solve(tspSearchOpts, cb);
-    }
-
-    function getCostMatrix(locations, costFunction) {
-        const costMatrix = new Array(locations.length);
-        for (let from = 0; from < locations.length; ++from) {
-            costMatrix[from] = new Array(locations.length);
-            for (let to = 0; to < locations.length; ++to) {
-                costMatrix[from][to] = costFunction(locations[from], locations[to]);
-            }
-        }
-        return costMatrix;
+            // return res.status(200).json(data);
+        });
     }
 
     return {
         matrix: matrix,
         getDistance: getDistance,
-        createArrayList: createArrayList,
-        createDemandMatrix: createDemandMatrix,
-        getCostMatrix: getCostMatrix,
         getToday: getToday,
-        solveVRP: solveVRP,
-        solveTSP: solveTSP
     };
 
 })();
 module.exports = library;
-
