@@ -15,14 +15,21 @@ CREATE TABLE item (
   packDate VARCHAR
 );
 
-CREATE TABLE receipt (
-  itemId  SERIAL REFERENCES port(ID),
-  locationId SERIAL REFERENCES port(ID),
+CREATE TABLE delivery (
+  ID SERIAL PRIMARY KEY,
+  itemId  SERIAL REFERENCES item(ID),
+  locationId SERIAL,
   lat float(7),
   lng float(7),
   timestamp bigint
   PRIMARY KEY (itemId, locationid)
 );
+
+CREATE TABLE proof (
+    deliveryId SERIAL REFERENCES delivery(ID)
+    hashValue VARCHAR, -- hashed delivery .
+    proof VARCHAR -- proof of hashed delivery integrity.
+)
 
 -- CREATE TABLE person (
 --     ID SERIAL PRIMARY KEY,

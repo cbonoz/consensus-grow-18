@@ -1,5 +1,5 @@
 ===
-Register Ports:
+Add an Item:
 ===
 Definition:
 POST /api/ports/add
@@ -29,7 +29,7 @@ Example Response:
 
 
 ===
-Get existing ports
+Record the delivery of an item
 ===
 Definition:
 GET /api/ports
@@ -46,7 +46,7 @@ Example Response:
 
 
 ===
-Create new jobs:
+Get the history of an item:
 ===
 Definition:
 POST /api/jobs/add

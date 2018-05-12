@@ -28,14 +28,14 @@ Record an instance of an item (equivalent to a packing slip or farmers label of 
 }
 </pre>
 
-Record receival of an item
+Record delivery of an item
 <pre>
 {
     "itemUuid": XXXX, // uuid of the received item.
     "locationUuid": XXXXX, // uuid of the receiving location
     "latitude": XXXX, // latitude of the receiver
     "longitude": XXX // longitude of the receiver
-    "timestamp": XXXXX // time of receipt
+    "timestamp": XXXXX // time of delivery
 }
 </pre>
 

@@ -12,7 +12,7 @@
     const user = process.env.ANCHOR_SUPPLY_DB_USER || "postgres";
     const pass = process.env.ANCHOR_SUPPLY_DB_PASS || "admin";
     const host = process.env.ANCHOR_SUPPLY_HOST || "localhost";
-    const db = process.env.ANCHOR_SUPPLY_DB || "anchorSupply";
+    const db = process.env.ANCHOR_SUPPLY_DB || "anchor";
     const PORT = process.env.ANCHOR_SUPPLY_SERVER_PORT || 9001;
 
     const COMPUTE_LIMIT_MS = 1000;
@@ -28,7 +28,7 @@
     const fs = require('fs');
     const http = require('http');
     const {Pool, Client} = require('pg');
-    const anchorSupply = require('./anchorSupply');
+    const anchor = require('./anchor');
 
     /*******
      * SETUP
