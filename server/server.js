@@ -28,7 +28,8 @@
     const fs = require('fs');
     const http = require('http');
     const {Pool, Client} = require('pg');
-    const anchorSupply = require('./anchorSupply');
+    const anchor = require('./anchor');
+    const escape = require('pg-escape');
 
     /*******
      * SETUP
@@ -105,16 +106,17 @@
      *  deliveries: [ {itemId, locationId, latitude, longitude, timeMs}, ... ]
      * }
      */
-    app.post('/api/delivieries/add', function (req, res, next) {
+    app.post('/api/deliveries/add', function (req, res, next) {
         const body = req.body;
-        const items = body.items;
+        const items = body.deliveries;
 
         const values = items.map((item) => {
+            console.log('item',item)
             return `(${item.itemId}, ${item.locationId}, ${item.lat}, ${item.lng}, ${item.timeMs})`;
         });
 
-        const insertQuery = `INSERT INTO delivery(itemId, locationId, lat, lng, timeMs) VALUES${values.join(',')} ON CONFLICT DO NOTHING`;
-        // console.log('item insertQuery', insertQuery);
+        const insertQuery = escape(`INSERT INTO delivery(itemId, locationId, lat, lng, timeMs) VALUES${values.join(',')} ON CONFLICT DO NOTHING`);
+        console.log('item insertQuery', insertQuery);
         pool.query(insertQuery, [], (err, data) => {
             if (err) {
                 const msg = JSON.stringify(err);
@@ -125,7 +127,6 @@
             return res.status(200).json(data);
         });
     });
-
 
     /*
      * Register new items with the AnchorSupply DB.
@@ -141,7 +142,7 @@
             return `('${item.name}', '${item.unit}', '${item.metadata}', '${item.uuid}', '${item.origin}', '${item.packDate}')`;
         });
 
-        const insertQuery = `INSERT INTO item(name, lat, lng) VALUES${values.join(',')} ON CONFLICT DO NOTHING`;
+        const insertQuery = escape(`INSERT INTO item(name, unit, metadata, uuid, origin, packDate) VALUES${values.join(',')} ON CONFLICT DO NOTHING`);
         // console.log('item insertQuery', insertQuery);
         pool.query(insertQuery, [], (err, data) => {
             if (err) {
@@ -155,6 +156,6 @@
     });
 
     server.listen(PORT, () => {
-        console.log('Express server listening on localhost item: ' + PORT);
+        console.log('Express server listening on localhost port: ' + PORT);
     });
 }());

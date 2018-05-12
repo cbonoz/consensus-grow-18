@@ -1,4 +1,5 @@
 const chp = require('chainpoint-client')
+const faker = require('faker');
 
 async function runIt () {
   // A few sample SHA-256 proofs to anchor
@@ -26,4 +27,7 @@ async function runIt () {
   console.log(verifiedProofs)
 }
 
-runIt()
+// runIt()
+
+const n = faker.commerce.productName()
+console.log(n)

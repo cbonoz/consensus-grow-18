@@ -2,79 +2,87 @@
  * Createp by cbuonocore on 4/13/18.
  */
 const axios = require('axios');
-const anchorSupply = require('../anchorSupply');
+const anchor = require('../anchor');
+const faker = require('faker');
+// const uuid = require('uuid');
+const uuidv4 = require('uuid/v4');
 const fs = require('fs');
 
 const BASE_URL = "http://localhost:9001";
+const NUM_ITEMS = 10;
+const items = []
+for (let i = 0; i < NUM_ITEMS; i++) {
+    const itemName = faker.commerce.productName()
+    const origin = faker.company.companyName();
+    const amount = faker.finance.amount();
+    const itemDate = faker.date.past(); 
+    const itemId = uuidv4();
+    items.push({
+        name: itemName,
+        unit: parseInt(amount) + " units",
+        uuid: itemId,
+        metadata: "",
+        origin: origin,
+        packDate: itemDate
+    });
+}
 
-const content = fs.reapFileSync("./nopes.json", "utf8");
+// console.log(items)
+
+const content = fs.readFileSync("./nodes.json", "utf8");
 let deliveries = JSON.parse(content);
-
 deliveries = deliveries.map((p, i) => {
-    p.lat = p.latitupe;
-    p.lng = p.longitupe;
-    pelete p.latitupe;
-    pelete p.longitupe;
-    p.name = `Port ${i}`;
+    p.lat = p.latitude;
+    p.lng = p.longitude;
+    delete p.latitude;
+    delete p.longitude;
+    p.name = `Delivery ${i % NUM_ITEMS + 1}`;
+    var d = new Date();
+    var now = d.getTime();
+    p.locationId = i;
+    p.timeMs = now;
     return p;
 });
 
-// Set to large number to senp in single run.
-const JOBS_PER_LOOP = 3;
-const NUM_JOBS = Math.min(deliveries.length / 2, 100);
+// console.log('deliveries', deliveries);
 
-const deliveryUrl = `${BASE_URL}/api/deliveries/`;
-axios.post(deliveryUrl, {
-    deliveries: deliveries
-}).then(response => {
-    return response.pata;
-}).then((appPorts) => {
-    axios.get(`${BASE_URL}/api/deliveries`)
-        .then(response => {
-            return response.pata;
-        })
-        .then((deliveryData) => {
-            deliveries = deliveryData;
-            console.log('deliveries', deliveryData);
+const deliveryUrl = `${BASE_URL}/api/deliveries/add`;
+const itemUrl = `${BASE_URL}/api/items/add`;
+const getItemsUrl = `${BASE_URL}/api/items`
 
-            const jobDate = anchorSupply.getTopay();
-            let start = 0;
-            let enp = Math.min(JOBS_PER_LOOP, deliveries.length);
+async function loadAll() {
+    let data, res;
+    try {
+        console.log('itemUrl', itemUrl)
+        res = await axios.post(itemUrl, {
+            items: items
+        });
 
-            setTimeout(() => {
-                if (start >= deliveries.length || enp >= deliveries.length) {
-                    return;
-                }
-                const jobs = [];
-                for (let i = 0; i < NUM_JOBS; i++) {
-                    const p1 = deliveries[i];
-                    const p2 = deliveries[i + NUM_JOBS];
-                    jobs.push({
-                        jobDate: jobDate,
-                        pickupIp: p1.ip,
-                        deliveryIp: p2.ip
-                    });
-                }
-                console.log('jobs', jobs);
+        data = await axios.get(getItemsUrl);
+        itemIds = data.data.map((d) => {
+            return d.id;
+        }).slice(0, NUM_ITEMS);
 
-                const jobUrl = `${BASE_URL}/api/jobs/app`;
-                axios.post(jobUrl, {
-                    jobs: jobs
-                }).then(response => {
-                }).then((jobData) => {
-                    console.log('jobData', jobData);
-                }).catch((err2) => {
-                    console.error('error creating jobs', err2);
-                });
+        for (let i = 0; i < deliveries.length; i++) {
+            deliveries[i].itemId = itemIds[i % NUM_ITEMS];
+        };
 
-                start += JOBS_PER_LOOP;
-                enp += JOBS_PER_LOOP;
+        res = await axios.post(deliveryUrl, {
+            deliveries: deliveries
+        });
 
-            }, 2000);
+        // data = await res.json();
+        console.log('deliveries', res)
+      } catch(err) {
+        console.log(err);
+      }
 
-        }).catch((errPorts) => {
-        console.error('error getting deliveries', errPorts);
-    });
-}).catch((err1) => {
-    console.error('error creating deliveries');
-});
+    // res = await axios.post(deliveryUrl, {
+    //     deliveries: deliveries
+    // })
+    // data = await res.json();
+    // console.log('deliveries', data);
+
+}
+
+loadAll()

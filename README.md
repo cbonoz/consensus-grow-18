@@ -24,7 +24,7 @@ POST /api/items/add
         "name": "Swiss Chard/Green", // name of the item (not necessarily unique)
         "unit": "12 BU", // quantity or size of the item
         "metadata": "Product of USA", // additional comments or info on this item
-        "uuid": XXXX, // uuid of the item
+        "uuid": XXXX, // uuid of the item (string)
         "origin": Satur Farms NY 11935"
         "packDate": "05-08-2018"
     },
@@ -37,11 +37,11 @@ Record deliveries of item(s)
 POST /api/deliveries/add
 [
     {
-        "itemId": XXXX, // uuid of the received item.
-        "locationId": XXXXX, // uuid of the receiving location
-        "lat": XXXX, // latitude of the receiver
-        "lng": XXX // longitude of the receiver
-        "timeMs": XXXXX // time of delivery
+        "itemId": XXXX, // uuid of the received item. (id)
+        "locationId": XXXXX, // uuid of the receiving location (id)
+        "lat": XXXX, // latitude of the receiver (float)
+        "lng": XXX // longitude of the receiver (float)
+        "timeMs": XXXXX // time of delivery (time ms)
     },
     ...
 ]
@@ -52,17 +52,19 @@ Get the history of an item
 <pre>
 GET /api/item/history
 {
-    "itemId": XXXX // uuid of the desired item.
+    "itemId": XXXX // uuid of the desired item (id)
 }
+</pre>
+
+Return all registered deliveries
+<pre>
+GET /api/deliveries
 </pre>
 
 
 Return all registered items
 <pre>
 GET /api/items
-{
-    "itemId": XXXX // uuid of the desired item.
-}
 </pre>
 
 ### Structure
