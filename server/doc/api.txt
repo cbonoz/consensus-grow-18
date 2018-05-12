@@ -1,0 +1,97 @@
+===
+Register Ports:
+===
+Definition:
+POST /api/ports/add
+
+Example Request Body:
+{
+    ports: [
+    {
+        name: 'Port 1',
+        lat: 33.89673601,
+        lng: -118.2262623
+    }]
+}
+
+Example Response:
+// Successful DB response.
+{
+    command: 'INSERT',
+    rowCount: 1,
+    oid: 0,
+    rows: [],
+    fields: [],
+    _parsers: [],
+    RowCtor: null,
+    rowAsArray: false
+}
+
+
+===
+Get existing ports
+===
+Definition:
+GET /api/ports
+
+Example Response:
+[
+    {
+        id: 0 // database-assigned id.
+        name: 'Port 1',
+        lat: 33.89673601,
+        lng: -118.2262623
+    }
+]
+
+
+===
+Create new jobs:
+===
+Definition:
+POST /api/jobs/add
+
+Example Request Body:
+{
+    jobs: [
+    {
+        day: '4-14-2018', // day of job
+        pickupId: 0, // portId of pickup location
+        deliveryId: 1, // portId of delivery location
+    }
+}
+
+Example Response:
+// Successful DB response.
+{
+    command: 'INSERT',
+    rowCount: 1,
+    oid: 0,
+    rows: [],
+    fields: [],
+    _parsers: [],
+    RowCtor: null,
+    rowAsArray: false
+}
+
+===
+Get Optimal Schedule for day
+===
+Definition:
+POST /api/schedule
+
+Example Request Body:
+{
+    startPortId: 0, // origin and return port for vehicles
+    numVehicles: 2, // number of vehicles starting at port
+    jobDate: '4-14-2018' // jobDate for optimal schedule computation
+}
+
+
+Example Response:
+{
+    cost: X, // optimal cost for schedule
+    routes:[[],[]], // nodes for each vehicle to visit (index i = route for truck i)
+    times:[[],[]] // times that truck i can acceptablely arrive/leave at each route node,
+}
+
