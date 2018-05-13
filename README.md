@@ -11,8 +11,7 @@ Biggest problems:
 Traceability - being able to answer questions such as where did this case of strawberries come from.
 Manual work - a lot of manual effort is spent recording and piecing together history for particular items.
 
-Use the Tierion API to perform delivery validation. I should be able to query on a particular item and get a linked list of that items history that is validated on Tierion and the BTC blockchain.
-
+Use the Tierion/Chainpoint API to perform delivery validation. I should be able to query on a particular item and get a linked list of that items history that is validated on Tierion and the BTC blockchain.
 
 ### API
 
@@ -77,7 +76,6 @@ GET /api/items
 
 ### Screenshots
 
-
 <div width="400" style="text-align:center">
     <h3>AnchorSupply Home Page</h3>
         <img src="./screenshots/home_page.png" width="600" style="margin: 0 auto"/>
@@ -89,18 +87,13 @@ GET /api/items
         <img src="./screenshots/routing_2.png" width="600" style="margin: 0 auto"/>
 </div>
 
-
 ### TODO:
 
 * Create Logo. X
-* Update pitch deck in drive folder. X
 * Create API documentation. Understand the api interfaces and json body formats. X
-* Finish 3 core API routes: add port, add job, query schedule.X
-* Add master google maps page to website. X
-* Research - what is the schedule data format that ports use. What kind of data will we most likely have access to, and how can this be inserted into this framework for pathfinding: https://github.com/mapbox/node-or-tools X
 * Create basic marketing website UI design / or use framework that allows plugging in an API doc page. X
-* Add tests to server code and routing. X
-* Check jobs table for duplicates. X
+* Add tests to server code.
+* Check items table for duplicates.
 
 ### Dev Notes
 <b>Check the `README.md` files in each subproject for how to start services.</b>
