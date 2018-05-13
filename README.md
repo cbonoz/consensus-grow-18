@@ -80,18 +80,13 @@ GET /api/items
 
 <div width="400" style="text-align:center">
     <h3>AnchorSupply Home Page</h3>
-        <img src="./screenshots/home.png" width="600" style="margin: 0 auto"/>
+        <img src="./screenshots/home_page.png" width="600" style="margin: 0 auto"/>
     <h3>Detailed Routing (Expanded View)</h3>
-        <img src="./screenshots/map_routes.png" width="600" style="margin: 0 auto"/>
-    <h3>Map Route Page showing 50 jobs (pickup/delivery pairs)</h3>
-        <img src="./screenshots/map.png" width="600" style="margin: 0 auto"/>
+        <img src="./screenshots/iphone.png" width="600" style="margin: 0 auto"/>
     <h3>API Documentation</h3>
         <img src="./screenshots/api.png" width="600" style="margin: 0 auto"/>
-    <h3>API Documentation (Detailed View)</h3>
-        <img src="./screenshots/api_single.png" width="600" style="margin: 0 auto"/>
-    <h3>Mobile App Screenshots</h3>
-        <img src="./screenshots/ip-job.png" width="600" style="margin: 0 auto"/>
-        <img src="./screenshots/ip-map.png" width="600" style="margin: 0 auto"/>
+    <h3>Proof of Delivery</h3>
+        <img src="./screenshots/routing_2.png" width="600" style="margin: 0 auto"/>
 </div>
 
 

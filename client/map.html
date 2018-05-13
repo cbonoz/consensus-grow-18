@@ -417,25 +417,21 @@
         function createProofChain(item, proofs) {
             let text = "";
             text += `<h3>Delivery Chain</h3>`;
-
             text += `<h4><b>Selected: ${item.name}</b></h4><hr/>
             <h5>Supply Origin: ${item.origin}</h5>
             <h5>${item.unit}</h5>`;
             proofs.map((proof) => {
                 const delivery = proof.delivery;
+                const date = new Date(parseInt(delivery.timems));
+                const dateString = date.toLocaleString("en-US");
                 text += `<div class="card" style="margin-bottom: 20px">
                     <div class="container">
-                        <div class="row">
-                        <span class="column-75">
                             <h4>Proof of Delivery</h4>
-                             <i>Destination: ${delivery.name} - (${delivery.lat}, ${delivery.lng})</i>
+                            <img src="img/check_mark.png" width="64" style="float: right"/>
+                             <i>Destination: ${delivery.name} - (${delivery.lat}, ${delivery.lng})<br/>Received: ${dateString}</i>
                             <p><b>Hash</b>: ${proof.hashvalue}</p>
-                            <p  style="max-width: 600px;"><b>Proof</b>: ${proof.proofvalue}</p>
-                            </div>
-                        <div class="column-25" >
-                            <img src="img/check_mark.png" width="32"/>
-                        </div>
-                        </div>
+                            <p style="max-width: 600px;"><b>Proof</b>: ${proof.proofvalue}</p>
+                            <a href="/map.html">Click here for full info.</a>
                     </div>
                 </div>`;
             });
@@ -509,11 +505,11 @@
             makeHistoryRequest(item);
         }
 
-        function getMarkerInfo(item, deliveryId, portName, pickup, stopNumber) {
+        function getMarkerInfo(item, deliveryId, locationName, pickup, stopNumber) {
             return `<div id="content">
-<div id="siteNotice"></div><h1 id="firstHeading" class="firstHeading">${portName}</h1><div id="bodyContent">
-<p><b>Item: ${item.name}</b></p>
-<p><b>Location Name: ${portName}</b></p><p><b>Delivery ${deliveryId}</b></p><p>Stop Type: ${pickup ? 'Pickup' : 'Delivery'}, Stop Number ${stopNumber}</p></div></div>`;
+<div id="siteNotice"></div><h1 id="firstHeading" class="firstHeading">${locationName}</h1><div id="bodyContent">
+<p><h3>Item: ${item.name}</h3></p>
+<p><b>Location Name: ${locationName}</b></p><p><b>Delivery ${deliveryId}</b></p><p>Stop Type: ${pickup ? 'Pickup' : 'Delivery'}, Stop Number ${stopNumber}</p></div></div>`;
         }
 
         function handleRouteData(data) {
