@@ -46,13 +46,16 @@ npm manifest:
       "axios": "^0.18.0",
       "body-parser": "^1.18.2",
       "chainpoint-client": "^0.1.5",
+      "colors": "^1.2.5",
       "cors": "^2.8.4",
+      "csvtojson": "^1.1.12",
       "express": "^4.16.3",
       "faker": "^4.1.0",
       "fs": "^0.0.1-security",
       "geo-lib": "^0.3.1",
       "geolib": "^2.0.24",
       "http": "^0.0.0",
+      "jsonexport": "^2.1.0",
       "lodash": "^4.17.5",
       "node_or_tools": "^1.0.5",
       "object-hash": "^1.3.0",
@@ -545,6 +548,10 @@ Lockfile:
     version "1.1.3"
     resolved "https://registry.yarnpkg.com/color-support/-/color-support-1.1.3.tgz#93834379a1cc9a0c61f82f52f0d04322251bd5a2"
   
+  colors@^1.2.5:
+    version "1.2.5"
+    resolved "https://registry.yarnpkg.com/colors/-/colors-1.2.5.tgz#89c7ad9a374bc030df8013241f68136ed8835afc"
+  
   combined-stream@1.0.6, combined-stream@^1.0.5, combined-stream@~1.0.5:
     version "1.0.6"
     resolved "https://registry.yarnpkg.com/combined-stream/-/combined-stream-1.0.6.tgz#723e7df6e801ac5613113a7e445a9b69cb632818"
@@ -642,6 +649,13 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/cryptiles/-/cryptiles-3.1.2.tgz#a89fbb220f5ce25ec56e8c4aa8a4fd7b5b0d29fe"
     dependencies:
       boom "5.x.x"
+  
+  csvtojson@^1.1.12:
+    version "1.1.12"
+    resolved "https://registry.yarnpkg.com/csvtojson/-/csvtojson-1.1.12.tgz#3872eef9588080f74c222ffe53cfdd416f9bb7d5"
+    dependencies:
+      lodash "^4.17.3"
+      strip-bom "^2.0.0"
   
   dashdash@^1.12.0:
     version "1.14.1"
@@ -1608,6 +1622,10 @@ Lockfile:
     version "5.0.1"
     resolved "https://registry.yarnpkg.com/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz#1296a2d58fd45f19a0f6ce01d65701e2c735b6eb"
   
+  jsonexport@^2.1.0:
+    version "2.1.0"
+    resolved "https://registry.yarnpkg.com/jsonexport/-/jsonexport-2.1.0.tgz#58701d0d9303a9b948304d22d8c566b0c108d296"
+  
   jsonify@~0.0.0:
     version "0.0.0"
     resolved "https://registry.yarnpkg.com/jsonify/-/jsonify-0.0.0.tgz#2c74b6ee41d93ca51b7b5aaee8f503631d252a73"
@@ -1676,7 +1694,7 @@ Lockfile:
       p-locate "^2.0.0"
       path-exists "^3.0.0"
   
-  lodash@^4.13.1:
+  lodash@^4.13.1, lodash@^4.17.3:
     version "4.17.10"
     resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.10.tgz#1b7793cf7259ea38fb3661d4d38b3260af8ae4e7"
   

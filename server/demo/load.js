@@ -3,6 +3,7 @@
  */
 const axios = require('axios');
 const anchor = require('../anchor');
+const colors = require('colors');
 const faker = require('faker');
 const escape = require('pg-escape');
 
@@ -31,16 +32,19 @@ const fs = require('fs');
 const BASE_URL = "http://localhost:9001";
 const NUM_ITEMS = 10;
 
-const READ_MANIFEST_FILE = true;
-const MANIFEST_FILE_NAME = "manifest.csv";
+const READ_MANIFEST_FILE = false;
 
 let items = [];
 let deliveries = [];
 
+function createFakeLocation() {
+    return escape(faker.company.companyName().replace("'", '').replace('"', ''));
+}
+
 if (!READ_MANIFEST_FILE) {
     for (let i = 0; i < NUM_ITEMS; i++) {
         const itemName = escape(faker.commerce.productName().replace("'", ''));
-        const origin = escape(faker.company.companyName().replace("'", ''));
+        const origin = createFakeLocation();
         const amount = faker.finance.amount();
         const itemDate = faker.date.past();
         const itemId = uuidv4();
@@ -65,6 +69,7 @@ if (!READ_MANIFEST_FILE) {
         var now = d.getTime() + i;
         p.locationId = i;
         p.timeMs = now;
+        p.name = createFakeLocation();
         return p;
     });
 
@@ -81,14 +86,12 @@ if (!READ_MANIFEST_FILE) {
     let content = fs.readFileSync("./items.csv", "utf8");
     items = csvJSON(content);
 
-    console.log('Read ' + items.length + ' items from csv')
-
     content = fs.readFileSync("./deliveries.csv", "utf8");
     deliveries = csvJSON(content);
-
-    console.log('Uploading ' + deliveries.length + ' deliveries from csv')
 }
 
+console.log(`Uploading ${items.length} item records from csv`.green);
+console.log(`Uploading ${deliveries.length} deliveries from csv`.green);
 // console.log('deliveries', deliveries);
 
 const deliveryUrl = `${BASE_URL}/api/deliveries/add`;
@@ -121,6 +124,8 @@ async function loadAll() {
         res = await axios.post(deliveryUrl, {
             deliveries: deliveries
         });
+
+        console.log('Done'.gray)
 
         // data = await res.json();
         // console.log('deliveries', res)

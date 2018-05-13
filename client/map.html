@@ -39,6 +39,23 @@
             height: 700px;
         }
 
+        .card {
+            /* Add shadows to create the "card" effect */
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            transition: 0.3s;
+        }
+
+        /* On mouse-over, add a deeper shadow */
+        .card:hover {
+            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        /* Add some padding inside the card container */
+        .container {
+            padding: 2px 16px;
+        }
+
+
     </style>
 
     <!-- Bootstrap core CSS -->
@@ -77,7 +94,7 @@
 </nav>
 <div class="container-fluid invisible viewpoint-fadeInUp">
     <div class="map-header">
-        <h1>Food Delivery Dashboard:</h1>
+        <h1>GrowNYC Dashboard:</h1>
         <span id="map-header-subtitle"></span>
         Date: <span id="date-section">
         </span>
@@ -87,61 +104,88 @@
 
     <div class="mx-auto" id="map"></div>
     <br/>
-    <h4>Truck Assignments:</h4>
-    <div id="result-section"></div>
+    <div class="row">
+        <div class="column">
+            <div id="result-section"></div>
+        </div>
+        <div class="column">
+            <div id="proof-section"></div>
+        </div>
+    </div>
 </div>
 <hr>
 
 <footer class="container py-4 mt-4">
-      <div class="row">
+    <div class="row">
         <div class="col-12 col-md">
           <span class="navbar-brand">
             <img style="max-width:35px; color: black;" class="navbar-left" src="img/logo.png">
             <strong>AnchorSupply</strong>
           </span>
-          <span class="d-block mb-3 text-muted">&copy; 2018</span>
+            <span class="d-block mb-3 text-muted">&copy; 2018</span>
         </div>
         <div class="col-6 col-md">
-          <h5>Features</h5>
-          <ul class="list-unstyled text-small">
-            <li><a class="text-muted" href="#">Map routing</a></li>
-            <li><a class="text-muted" href="#">API docs</a></li>
-            <li><a class="text-muted" href="#">Mobile app</a></li>
-          </ul>
+            <h5>Features</h5>
+            <ul class="list-unstyled text-small">
+                <li><a class="text-muted" href="#">Map routing</a></li>
+                <li><a class="text-muted" href="#">API docs</a></li>
+                <li><a class="text-muted" href="#">Mobile app</a></li>
+            </ul>
         </div>
         <div class="col-6 col-md">
-          <h5>Map</h5>
-          <ul class="list-unstyled text-small">
-            <li><a class="text-muted" href="#">Schedule</a></li>
-            <li><a class="text-muted" href="#">Vehicles</a></li>
-            <li><a class="text-muted" href="#">Routing</a></li>
-          </ul>
+            <h5>Map</h5>
+            <ul class="list-unstyled text-small">
+                <li><a class="text-muted" href="#">Schedule</a></li>
+                <li><a class="text-muted" href="#">Vehicles</a></li>
+                <li><a class="text-muted" href="#">Routing</a></li>
+            </ul>
         </div>
         <div class="col-6 col-md">
-          <h5>API</h5>
-          <ul class="list-unstyled text-small">
-            <li><a class="text-muted" href="#">Add an item</a></li>
-            <li><a class="text-muted" href="#">Record a delivery</a></li>
-            <li><a class="text-muted" href="#">Get the history of an item</a></li>
-            <li><a class="text-muted" href="#">Optimal schedule</a></li>
-          </ul>
+            <h5>API</h5>
+            <ul class="list-unstyled text-small">
+                <li><a class="text-muted" href="#">Add an item</a></li>
+                <li><a class="text-muted" href="#">Record a delivery</a></li>
+                <li><a class="text-muted" href="#">Get the history of an item</a></li>
+                <li><a class="text-muted" href="#">Optimal schedule</a></li>
+            </ul>
         </div>
         <div class="col-6 col-md">
-          <h5>About</h5>
-          <ul class="list-unstyled text-small">
-            <li><a class="text-muted" href="#">Team</a></li>
-            <li><a class="text-muted" href="#">Privacy</a></li>
-            <li><a class="text-muted" href="#">Terms</a></li>
-          </ul>
+            <h5>About</h5>
+            <ul class="list-unstyled text-small">
+                <li><a class="text-muted" href="#">Team</a></li>
+                <li><a class="text-muted" href="#">Privacy</a></li>
+                <li><a class="text-muted" href="#">Terms</a></li>
+            </ul>
         </div>
-      </div>
-    </footer>
+    </div>
+</footer>
 <!-- Placed at the end of the document so the pages load faster -->
 <script
         src="https://code.jquery.com/jquery-3.3.1.js"
         integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
         crossorigin="anonymous">
 </script>
+
+<style>
+    .row {
+        display: flex;
+    }
+
+    .column {
+        flex: 50%;
+        padding: 20px;
+    }
+
+    .column-75 {
+        flex: 75%;
+        padding: 10px;
+    }
+
+    .column-25 {
+        flex: 25%;
+        padding: 10px;
+    }
+</style>
 
 <script>
 
@@ -150,7 +194,7 @@
     // Australia which was made by Charles Kingsford Smith.
 
     function initMap() {
-        var map = new google.maps.Map(document.getElementById('map'), {
+        const map = new google.maps.Map(document.getElementById('map'), {
             zoom: 3,
             center: {lat: 0, lng: -180},
             styles: [
@@ -365,19 +409,79 @@
             return color;
         }
 
+        function createProofChain(item, proofs) {
+            let text = "";
+            text += `<h3>Delivery Chain Proof</h3>`;
+
+            text += `<h4><b>Item: ${item.name}</b></h4><hr/>
+            <h5>Supply Origin: ${item.origin}</h5>
+            <h5>${item.unit}</h5>`;
+            proofs.map((proof) => {
+                const delivery = proof.delivery;
+                text += `<div class="card" style="margin-bottom: 20px">
+                    <div class="container">
+                        <div class="row">
+                        <span class="column-75">
+                            <h4>Proof of Delivery</h4>
+                             <i>Destination: ${delivery.name} - (${delivery.lat}, ${delivery.lng})</i>
+                            <p><b>Hash</b>: ${proof.hashvalue}</p>
+                            <p  style="max-width: 400px;"><b>Proof</b>: ${proof.proofvalue}</p>
+                            </div>
+                        <div class="column-25" >
+                            <img src="img/check_mark.png" width="32"/>
+                        </div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            return text;
+        }
+
+//        const url = "http://13.65.170.101:9001";
+        const url = "http://localhost:9001";
+
+        function handleHistoryData(data, item) {
+            console.log('handleHistoryData', data);
+            const proofs = Object.keys(data.proofs).map((key) => {
+                const d = data.proofs[key];
+                d.delivery = data.deliveries[key];
+                return d;
+            });
+            const text = createProofChain(item, proofs);
+//            console.log(text);
+            $('#proof-section').html(text)
+        }
+
+        function makeHistoryRequest(item) {
+            const itemId = item.id;
+            const historyUrl = `${url}/api/item/history/${itemId}`;
+            $.ajax({
+                url: historyUrl,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (response) {
+                    handleHistoryData(response, item)
+                },
+                error: handleError
+            });
+        }
+
         function toggleBounce() {
             const marker = this;
             if (marker.getAnimation() !== null) {
                 marker.setAnimation(null);
             } else {
                 marker.setAnimation(google.maps.Animation.BOUNCE);
+                setTimeout(() => {
+                    marker.setAnimation(null);
+                }, 1000)
             }
         }
 
         const startLocationId = 1;
-        var markers;
+        let markers;
 
-        var firstRun = true;
+        let firstRun = true;
 
         const icons = {
             pickup: './img/pickup.png',
@@ -387,17 +491,22 @@
 
         function handleError(res, textStatus, errorThrown) {
             console.log('handleError', textStatus, errorThrown);
-            var message;
-            if (res.status === 400) {
-                message = "Solution satisfying constraints not possible";
-            } else {
-                message = JSON.stringify(res);
-            }
-            $("#error-text").html(`Error deriving schedule, ${message}.`);
+            let message = `No Delivery Information available`;
+//            if (res.status === 400) {
+//                message = "Solution satisfying constraints not possible";
+//            } else {
+//                message = JSON.stringify(res);
+//            }
+            $("#error-text").html(message);
         }
 
-        function getMarkerInfo(truck, portName, pickup, stopNumber) {
-            return `<div id="content"><div id="siteNotice"></div><h1 id="firstHeading" class="firstHeading">${portName}</h1><div id="bodyContent"><p><b>Location Name: ${portName}</b></p><p><b>Route ${truck}</b></p><p>Stop Type: ${pickup ? 'Pickup' : 'Deliver'}, Stop Number ${stopNumber}</p></div></div>`;
+        function getHistoryInfo(item) {
+            makeHistoryRequest(item);
+        }
+
+        function getMarkerInfo(itemId, deliveryId, portName, pickup, stopNumber) {
+            return `<div id="content">
+<div id="siteNotice"></div><h1 id="firstHeading" class="firstHeading">${portName}</h1><div id="bodyContent"><p><b>Location Name: ${portName}</b></p><p><b>Delivery ${deliveryId}</b></p><p>Stop Type: ${pickup ? 'Pickup' : 'Deliver'}, Stop Number ${stopNumber}</p></div></div>`;
         }
 
         function handleRouteData(data) {
@@ -410,11 +519,13 @@
             const items = data.items;
             const itemIds = Object.keys(deliveries);
 
-            let routeText = `<p>Format: Item #: {List of delivery locations}.<br/>'0' indicates the home truck depot.</p>`;
-
+            let routeText = `<p>Format: <b>Item (id #)</b>: {List of delivery locations}.</p>`;
+            routeText += `<p>The first node indicates the product origin.</p>`;
             routeText += "<ul>";
             // choose arbitrarily the first item of the deliveries map to be the start location.
             const startLocation = deliveries[itemIds[0]][0];
+
+            const bounds = new google.maps.LatLngBounds();
 
             markers.push(new google.maps.Marker({
                 map: map,
@@ -426,59 +537,69 @@
             }));
 
             itemIds.map((itemId, vehicleIndex) => {
+                const item = items[itemId];
+                const itemName = item.name;
                 const itemDeliveryMaps = [];
                 itemDeliveryMaps.push({lat: startLocation.lat, lng: startLocation.lng});
                 const route = deliveries[itemId];
-                route.map((currentLocation, i) => {
-                    const position = {lat: currentLocation.lat, lng: currentLocation.lng};
+                route.map((delivery, i) => {
+                    const position = {lat: delivery.lat, lng: delivery.lng};
+                    const name = delivery.name;
                     itemDeliveryMaps.push(position);
-                    const isPickup = i == 0;
-                    const markerName = "Delivery " + (i + 1);
+                    const isPickup = i === 0;
+                    const markerName = `Delivery: ${name}`;
                     const marker = new google.maps.Marker({
                         map: map,
                         draggable: false,
-                        icon: isPickup ? icons.pickup : icons.delivery,
+//                        icon: isPickup ? icons.pickup : icons.delivery,
                         animation: firstRun ? google.maps.Animation.DROP : null,
                         position: position,
-                        title: markerName,
+                        title: 'Delivery',
                         optimized: false
                     });
 
                     markers.push(marker);
                     marker.addListener('click', toggleBounce);
                     const infowindow = new google.maps.InfoWindow({
-                        content: getMarkerInfo(vehicleIndex, markerName, isPickup, i)
+                        content: getMarkerInfo(itemId, delivery.id, markerName, isPickup, i)
                     });
                     marker.addListener('click', function () {
+                        getHistoryInfo(item);
                         infowindow.open(map, marker);
+                        setTimeout(() => {
+                            infowindow.close();
+                        }, 2000)
                     });
 
                 });
 
                 function formatLocation(r) {
-                    return `(${r.lat}, ${r.lng})`;
+                    const date = new Date(parseInt(r.timems));
+                    const dateString = date.toLocaleString("en-US");
+                    return `${dateString}: ${r.name} (${r.lat}, ${r.lng})`;
                 }
+
                 const startLocationFormatted = formatLocation(startLocation);
-                const truckRoute = `Item ${vehicleIndex}: ${[startLocationFormatted].concat(route.map((r) => formatLocation(r))).concat([startLocationFormatted]).join(' -> ')}`;
-                routeText += "<li>" + truckRoute + "</li>";
-                console.log(truckRoute);
+                const itemRoute = `<b>${itemName} (id: ${itemId}</b>):<br/> <span class="route-expanded" ${[startLocationFormatted].concat(route.map((r) => formatLocation(r))).join('<br/> - ')}</span>`;
+                routeText += `<li onClick="">` + itemRoute + "</li>";
+//                console.log(itemRoute);
                 // itemDeliveryMaps.push({lat: startLocation.lat, lng: startLocation.lng});
 
                 // Define a symbol using a predefined path (an arrow)
                 // supplied by the Google Maps JavaScript API.
-                var lineSymbol = {
+                let lineSymbol = {
                     path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW
                 };
 
                 const color = getRandomColor();
 
-                for (var i = 0, n = itemDeliveryMaps.length; i < n; i++) {
+                for (let i = 0, n = itemDeliveryMaps.length; i < n; i++) {
 
-                    var coordinates = new Array();
-                    for (var j = i; j < i + 2 && j < n; j++) {
+                    let coordinates = [];
+                    for (let j = i; j < i + 2 && j < n; j++) {
                         coordinates[j - i] = itemDeliveryMaps[j];
                     }
-                    var polyline = new google.maps.Polyline({
+                    let polyline = new google.maps.Polyline({
                         path: coordinates,
                         strokeColor: color,
                         strokeOpacity: 1.0,
@@ -494,16 +615,23 @@
             });
 
             firstRun = false;
-             $("#result-section").html('' + routeText);
+            routeText = `<h3>Product History:</h3><hr/>` + routeText;
+            $("#result-section").html(routeText);
 
             const lat = startLocation.lat;
             const lng = startLocation.lng;
             console.log('center', lat, lng);
 
             // Center the map at the starting node
-            const center = new google.maps.LatLng(lat, lng);
-            map.setCenter(center);
-            map.setZoom(11);
+//            const center = new google.maps.LatLng(lat, lng);
+//            map.setCenter(center);
+//            map.setZoom(11);
+            markers.map((marker) => {
+                loc = new google.maps.LatLng(marker.position.lat(), marker.position.lng());
+                bounds.extend(loc);
+            });
+            map.fitBounds(bounds);
+            map.panToBounds(bounds);
             map.setMapTypeId('satellite');
 
             $("#map-header-subtitle").html(`${itemIds.length} items active today -`)
@@ -516,22 +644,7 @@
         // vehicleCapacity 2 -> 'Dual Transactions'
 
         // TODO: fix problem where numVehicles*vehicleCapacity requiring to be > # nodes.
-        const data = {
-        };
-
-//        const url = "http://13.65.170.101:9001";
-        const url = "http://localhost:9001";
-
-        function makeProofRequest(deliveryIds) {
-            $.ajax({
-                url: `${url}/api/proofs`,
-                type: 'POST',
-                data: JSON.stringify(data),
-                contentType: 'application/json; charset=utf-8',
-                success: handleProofData,
-                error: handleError
-            });
-        }
+        const data = {};
 
         function makeRouteRequest(routeData) {
             console.log('makeRouteRequest');

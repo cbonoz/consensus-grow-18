@@ -21,7 +21,8 @@ CREATE TABLE delivery (
   locationId SERIAL,
   lat float(7),
   lng float(7),
-  timeMs bigint
+  timeMs bigint,
+  name VARCHAR
 );
 
 CREATE TABLE proof (

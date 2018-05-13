@@ -23,6 +23,7 @@
      ***********/
     const axios = require('axios');
     const express = require('express');
+    const colors = require('colors')
     const cors = require('cors');
     const bodyParser = require('body-parser');
     const fs = require('fs');
@@ -71,7 +72,7 @@
         });
     });
 
-     /*
+    /*
      * Returns registered items.
      */
     app.get('/api/deliveries', (err, res) => {
@@ -100,16 +101,21 @@
                 const result = {};
                 result.deliveries = deliveryMap;
                 const itemMap = {};
-                data.rows.map((item) => {
+                const items = data.rows;
+                if (!items) {
+                    throw 'No items found in database, did you load your item spreadsheet?';
+                }
+
+                items.map((item) => {
                     itemMap[item.id] = item;
-                })
+                });
                 result.items = itemMap;
                 return res.status(200).json(result);
             });
         });
     });
 
-    app.get('/api/item/history/:itemId', (err, res) => {
+    app.get('/api/item/history/:itemId', (req, res, next) => {
         const itemId = req.params.itemId;
         const itemQuery = `SELECT * from delivery where itemId=${itemId}`;
         console.log(itemQuery);
@@ -119,9 +125,30 @@
                 return res.status(500).json(msg);
             }
 
-            return res.status(200).json(data.rows);
+            const historyMap = {};
+            const deliveries = data.rows;
+            historyMap.deliveries = {};
+            deliveries.map((d) => {
+                historyMap.deliveries[d.id] = d;
+            });
+
+            const proofQuery = `SELECT * from proof where deliveryId in (${deliveries.map((d) => d.id).join(',')})`;
+            pool.query(proofQuery, (err, data) => {
+                if (err) {
+                    const msg = JSON.stringify(err);
+                    return res.status(500).json(msg);
+                }
+
+                const proofs = data.rows;
+                historyMap.proofs = {};
+                proofs.map((p) => {
+                    historyMap.proofs[p.deliveryid] = p;
+                });
+
+                return res.status(200).json(historyMap);
+            });
         });
-    })
+    });
 
     /*
      * Register new deliveries with the AnchorSupply DB.
@@ -133,12 +160,13 @@
         const body = req.body;
         const deliveries = body.deliveries;
 
-        const values = deliveries.map((item) => {
-            return `(${item.itemId}, ${item.locationId}, ${item.lat}, ${item.lng}, ${item.timeMs})`;
+        const values = deliveries.map((delivery) => {
+            return `(${delivery.itemId}, ${delivery.locationId}, ${delivery.lat}, ` +
+                `${delivery.lng}, ${delivery.timeMs}, '${delivery.name}')`;
         });
 
-        const insertQuery = escape(`INSERT INTO delivery(itemId, locationId, lat, lng, timeMs) VALUES${values.join(',')} ON CONFLICT DO NOTHING RETURNING *`);
-        console.log('item insertQuery', insertQuery);
+        const insertQuery = escape(`INSERT INTO delivery(itemId, locationId, lat, lng, timeMs, name) VALUES${values.join(',')} ON CONFLICT DO NOTHING RETURNING *`);
+        console.log('delivery insertQuery', insertQuery);
         pool.query(insertQuery, [], (err, data) => {
             if (err) {
                 const msg = JSON.stringify(err);
@@ -147,7 +175,7 @@
             }
             // console.log('delivery data', data)
             const inserted = data.rows;
-            console.log('server recorded', inserted.length, 'deliveries');
+            console.log('server recorded', inserted.length, 'deliveries'.green);
             anchor.saveDeliveries(inserted, pool);
 
             return res.status(200).json(data);
@@ -170,7 +198,7 @@
             }
 
             const inserted = data.rows;
-            console.log('server recorded', inserted.length, 'proofs');
+            console.log('server recorded', inserted.length, 'proofs'.green);
 
             return res.status(200).json(data);
         });
@@ -190,8 +218,9 @@
             return `('${item.name}', '${item.unit}', '${item.metadata}', '${item.uuid}', '${item.origin}', '${item.packDate}')`;
         });
 
-        const insertQuery = escape(`INSERT INTO item(name, unit, metadata, uuid, origin, packDate) VALUES${values.join(',')} ON CONFLICT DO NOTHING  RETURNING *`);
-        // console.log('item insertQuery', insertQuery);
+        const insertQuery = escape(`INSERT INTO item(name, unit, metadata, uuid, origin, packDate) `+
+            `VALUES${values.join(',')} ON CONFLICT DO NOTHING RETURNING *`);
+        console.log('item insertQuery', insertQuery);
         pool.query(insertQuery, [], (err, data) => {
             if (err) {
                 const msg = JSON.stringify(err);
@@ -206,4 +235,4 @@
     server.listen(PORT, () => {
         console.log('Express server listening on localhost port: ' + PORT);
     });
-}());
+})();

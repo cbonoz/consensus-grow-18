@@ -30,6 +30,7 @@
     "axios": "^0.18.0",
     "body-parser": "^1.18.2",
     "chainpoint-client": "^0.1.5",
+    "colors": "^1.2.5",
     "cors": "^2.8.4",
     "csvtojson": "^1.1.12",
     "express": "^4.16.3",
