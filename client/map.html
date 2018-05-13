@@ -411,9 +411,9 @@
 
         function createProofChain(item, proofs) {
             let text = "";
-            text += `<h3>Delivery Chain Proof</h3>`;
+            text += `<h3>Delivery Chain</h3>`;
 
-            text += `<h4><b>Item: ${item.name}</b></h4><hr/>
+            text += `<h4><b>Selected: ${item.name}</b></h4><hr/>
             <h5>Supply Origin: ${item.origin}</h5>
             <h5>${item.unit}</h5>`;
             proofs.map((proof) => {
@@ -425,7 +425,7 @@
                             <h4>Proof of Delivery</h4>
                              <i>Destination: ${delivery.name} - (${delivery.lat}, ${delivery.lng})</i>
                             <p><b>Hash</b>: ${proof.hashvalue}</p>
-                            <p  style="max-width: 400px;"><b>Proof</b>: ${proof.proofvalue}</p>
+                            <p  style="max-width: 600px;"><b>Proof</b>: ${proof.proofvalue}</p>
                             </div>
                         <div class="column-25" >
                             <img src="img/check_mark.png" width="32"/>
@@ -615,7 +615,7 @@
             });
 
             firstRun = false;
-            routeText = `<h3>Product History:</h3><hr/>` + routeText;
+            routeText = `<h3>Today's Deliveries:</h3><hr/>` + routeText;
             $("#result-section").html(routeText);
 
             const lat = startLocation.lat;

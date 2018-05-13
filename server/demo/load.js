@@ -65,8 +65,8 @@ if (!READ_MANIFEST_FILE) {
         p.lng = p.longitude;
         delete p.latitude;
         delete p.longitude;
-        var d = new Date();
-        var now = d.getTime() + i;
+        const d = new Date();
+        const now = d.getTime() + i;
         p.locationId = i;
         p.timeMs = now;
         p.name = createFakeLocation();
