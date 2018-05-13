@@ -73,10 +73,10 @@
               aria-selected="false">
               <i class="material-icons v-align">work</i>&nbsp;Get Item History
             </a>
-            <!-- <a class="list-group-item list-group-item-blue" id="nav-schedule-tab" data-toggle="tab" href="#nav-stim"
+            <a class="list-group-item list-group-item-blue" id="nav-schedule-tab" data-toggle="tab" href="#nav-stim"
                        role="tab" aria-controls="nav-schedule" aria-selected="false">
-                        <i class="material-icons v-align">timer</i>&nbsp;Get Stimming Status
-                    </a> -->
+                        <i class="material-icons v-align">timer</i>&nbsp;Verify a Delivery Record
+                    </a>
           </div>
         </nav>
 
@@ -197,23 +197,24 @@ size of the item "metadata": "Product of USA", // additional comments or info on
 
               <div class="tab-pane fade" id="nav-stim" role="tabpanel" aria-labelledby="nav-schedule-tab">
                 <div class="jumbotron-custom bg-custom">
-                  <h1 class="d-block" id="skiptocontent">Get Stimming Status:</h1>
+                  <h1 class="d-block" id="skiptocontent">Verify a Delivery Record:</h1>
                 </div>
                 <pre>
   <span class="token description">
   ===
-  Get current Stimming status for a particular userId
-  ===</span>
+    Compare delivery records against history using Tierion and Chainpoint (used internally to the API).
+  ===
+  </span>
 
   <span class="token title">Definition:</span>
   <span class="token code-body">
-  GET /status
+  POST /api/record/verify
   </span>
 
   <span class="token title">Example Request Body:</span>
   <span class="token code-body">
   {
-      <span class="token json-key">userId</span>: <span class="token number">XXXX</span>, <span class="token comment">// userId of the desired user</span>
+    ...record body
   }
   </span>
 
@@ -221,7 +222,7 @@ size of the item "metadata": "Product of USA", // additional comments or info on
   <span class="token code-body">
   {
       <span class="token json-key">status</span>: 1, <span
-          class="token comment">// 1 if detected stimming, 0 if in normal state</span>
+          class="token comment">// 1 if valid, 0 if no match.</span>
   }
     </span>
 
