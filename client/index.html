@@ -27,12 +27,18 @@
         .center-text, .text-center {
             margin: 20px
         }
+
+        .sticky {
+            /*position: fixed;*/
+            /*top: 0;*/
+            /*width: 100%;*/
+        }
     </style>
 </head>
 
 <body>
 
-<nav class="navbar navbar-expand-sm navbar-light bg-light">
+<nav class="navbar navbar-expand-sm navbar-light bg-light sticky">
     <a class="navbar-brand mx-4" href="index.html">
         <img style="max-width:35px;" class="navbar-left" src="img/logo.png">
         <strong>AnchorSupply</strong>
@@ -64,7 +70,7 @@
     <span id="ThreeJsCanvas" class="invisible viewpoint-fadeInUp-delay2"></span>
     <div class="col-md-5 p-lg-5 mx-auto my-5 invisible viewpoint-fadeInRight">
         <h1 class="display-4 font-weight-normal"><strong>AnchorSupply</strong></h1>
-        <p class="lead font-weight-normal text-cyan">A Universal, Intelligent Supply Chain Verification Platform.</p>
+        <p class="lead font-weight-normal">A Universal, Intelligent Supply Chain Verification Platform.</p>
         <a class="btn btn-outlined btn-big btn-custom" data-toggle="modal" data-target="#myModal" href="#">Sign up<i
                 class="material-icons v-align md-18">arrow_forward</i></a>
     </div>
@@ -188,7 +194,7 @@
         </div>
         <div class="col-sm-4 invisible viewpoint-fadeInUp">
             <i class="material-icons md-custom md-48">location_on</i>
-            <h4 class="pt-4 feature-text">Blockchain-backed Delivery Verification</h4>
+            <h4 class="pt-4 feature-text">Blockchain Delivery Verification with ChainPoint</h4>
             <!-- <p>Lorem ipsum dolor sit amet..</p> -->
         </div>
         <div class="col-sm-4 invisible viewpoint-fadeInUp-delay2">
@@ -381,7 +387,7 @@
     THREE.ImageUtils.crossOrigin = '';
     // var location_icon_image = THREE.ImageUtils.loadTexture( 'http://oi67.tinypic.com/6fql9h.jpg' );
     // var location_icon_image = THREE.ImageUtils.loadTexture( 'http://i.imgur.com/j7dzU42.jpg' );
-    var location_icon_image_logo = THREE.ImageUtils.loadTexture('https://i.imgur.com/tu52RXt.png');
+    var location_icon_image_logo = THREE.ImageUtils.loadTexture('https://image.ibb.co/gao3iy/logo.png');
     var location_icon_image = THREE.ImageUtils.loadTexture('https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Map_marker.svg/1000px-Map_marker.svg.png');
 
     var location_icon_imageMaterial_logo = new THREE.MeshBasicMaterial({

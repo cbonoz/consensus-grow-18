@@ -14,6 +14,13 @@
     <title>AnchorSupply</title>
 
     <style>
+        #proof-section {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            text-overflow: ellipsis;
+            -webkit-box-orient: vertical;
+        }
         #date-section {
             font-style: italic;
         }
@@ -169,21 +176,19 @@
 <style>
     .row {
         display: flex;
+        padding: 20px;
     }
 
     .column {
-        flex: 50%;
-        padding: 20px;
+        flex: 40%;
     }
 
     .column-75 {
         flex: 75%;
-        padding: 10px;
     }
 
     .column-25 {
         flex: 25%;
-        padding: 10px;
     }
 </style>
 
@@ -504,9 +509,11 @@
             makeHistoryRequest(item);
         }
 
-        function getMarkerInfo(itemId, deliveryId, portName, pickup, stopNumber) {
+        function getMarkerInfo(item, deliveryId, portName, pickup, stopNumber) {
             return `<div id="content">
-<div id="siteNotice"></div><h1 id="firstHeading" class="firstHeading">${portName}</h1><div id="bodyContent"><p><b>Location Name: ${portName}</b></p><p><b>Delivery ${deliveryId}</b></p><p>Stop Type: ${pickup ? 'Pickup' : 'Deliver'}, Stop Number ${stopNumber}</p></div></div>`;
+<div id="siteNotice"></div><h1 id="firstHeading" class="firstHeading">${portName}</h1><div id="bodyContent">
+<p><b>Item: ${item.name}</b></p>
+<p><b>Location Name: ${portName}</b></p><p><b>Delivery ${deliveryId}</b></p><p>Stop Type: ${pickup ? 'Pickup' : 'Delivery'}, Stop Number ${stopNumber}</p></div></div>`;
         }
 
         function handleRouteData(data) {
@@ -547,28 +554,28 @@
                     const name = delivery.name;
                     itemDeliveryMaps.push(position);
                     const isPickup = i === 0;
-                    const markerName = `Delivery: ${name}`;
+                    const markerName = `Delivery`;
                     const marker = new google.maps.Marker({
                         map: map,
                         draggable: false,
 //                        icon: isPickup ? icons.pickup : icons.delivery,
                         animation: firstRun ? google.maps.Animation.DROP : null,
                         position: position,
-                        title: 'Delivery',
+                        title: markerName,
                         optimized: false
                     });
 
                     markers.push(marker);
                     marker.addListener('click', toggleBounce);
                     const infowindow = new google.maps.InfoWindow({
-                        content: getMarkerInfo(itemId, delivery.id, markerName, isPickup, i)
+                        content: getMarkerInfo(item, delivery.id, markerName, isPickup, i)
                     });
                     marker.addListener('click', function () {
                         getHistoryInfo(item);
                         infowindow.open(map, marker);
                         setTimeout(() => {
                             infowindow.close();
-                        }, 2000)
+                        }, 5000)
                     });
 
                 });
