@@ -99,7 +99,7 @@
                 <pre>
   <span class="token description">
   ===
-      Run a Stimming prediction based on provided data
+      Add item(s) for delivery/inventory tracking.
   ===</span>
 
   <span class="token title">Definition:</span>
@@ -111,9 +111,18 @@
 
 <span class="token code-body">
   <pre>
- {"items" :[ { "name": "Swiss Chard/Green", // name of the item (not necessarily unique) "unit": "12 BU", // quantity or
-size of the item "metadata": "Product of USA", // additional comments or info on this item "uuid": XXXX, // uuid of the item
-"origin": Satur Farms NY 11935" "packDate": "05-08-2018" }, ... ] }
+ {"items" :
+    [
+        {
+            "name": "Swiss Chard/Green", // name of the item (not necessarily unique)
+            "unit": "12 BU", // quantity or amount of the item.
+            "metadata": "Product of USA", // additional comments or info on this item
+            "uuid": XXXX, // uuid of the item
+            "origin": Satur Farms NY 11935" "packDate": "05-08-2018"
+        },
+        ...
+    ]
+}
 </pre>
 </span>
                             <span class="token title">
@@ -147,9 +156,18 @@ size of the item "metadata": "Product of USA", // additional comments or info on
 
   <span class="token title">Example Response:</span>
   <span class="token code-body">
-  {
-      <span class="token json-key">userId</span>: <span class="token number">XXXXXXX</span> <span class="token comment">// database-assigned userId.</span>
-  }
+<pre>
+[
+    {
+        "itemId": XXXX, // uuid of the received item. (id)
+        "locationId": XXXXX, // uuid of the receiving location (id)
+        "lat": XXXX, // latitude of the receiver (float)
+        "lng": XXX // longitude of the receiver (float)
+        "timeMs": XXXXX // time of delivery (time ms)
+    },
+    ...
+]
+  </pre>
   </span>
 
   <span class="token title">Example Response:</span>
@@ -187,9 +205,21 @@ size of the item "metadata": "Product of USA", // additional comments or info on
   <span class="token title">Example Response:</span>
   <span class="token comment">// Successful DB response.</span>
 <span class="token code-body">
+<pre>
 [
-  ...list of deliveries for the particular item id.
+    {
+        "itemId": 1, // uuid of the received item. (id)
+        "locationId": XXXXX, // uuid of the receiving location (id)
+        "lat": XXXX, // latitude of the receiver (float)
+        "lng": XXX // longitude of the receiver (float)
+        "timeMs": XXXXX // time of delivery (time ms)
+    }, {
+        "itemId": 1, // same uuid.
+      ...
+    },
+    ...
 ]
+</pre>
 </span>
 
                 <!-- end create new jobs -->
@@ -208,21 +238,36 @@ size of the item "metadata": "Product of USA", // additional comments or info on
 
   <span class="token title">Definition:</span>
   <span class="token code-body">
-  POST /api/record/verify
+  POST /api/proofs/verify
   </span>
 
   <span class="token title">Example Request Body:</span>
   <span class="token code-body">
-  {
-    ...record body
-  }
+<pre>
+  Supply a list of proofs (of suspected valid delivery proofs) for verification.
+{"proofs":
+  [
+      {
+        "uri": "http://0.0.0.0",
+        "hash": "9d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a",
+        "hashIdNode": "a512e430-d3cb-11e7-aeb7-01eecbb37e34"
+      },
+      {
+        "uri": "http://0.0.0.0",
+        "hash": "9d2a9e92b561440e8d27a21eed114f7018105db00262af7d7087f7dea9986b0a",
+        "hashIdNode": "a4b6e180-d3cb-11e7-90bc-014342a27e15"
+      }
+  ]
+}
+</pre>
+
   </span>
 
   <span class="token title">Example Response:</span>
   <span class="token code-body">
   {
-      <span class="token json-key">status</span>: 1, <span
-          class="token comment">// 1 if valid, 0 if no match.</span>
+      <span class="token json-key">valid</span>: 1, <span
+          class="token comment">// 1 if the proof is valid (matches an existing delivery proof entry), 0 if no match.</span>
   }
     </span>
 

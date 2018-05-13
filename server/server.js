@@ -182,6 +182,23 @@
         });
     });
 
+    async function verifyProofs(res, proofs) {
+
+    }
+
+    app.post('/api/proofs/verify', function (req, res, next) {
+        const body = req.body;
+        const proofs = body.proofs;
+
+        (async function() { // async function expression used as an IIFE
+            // Verify every anchor in every Calendar proof
+            let verifiedProofs = await chp.verifyProofs(proofs);
+            console.log("Verified Proof Objects: Expand objects below to inspect.")
+            console.log(verifiedProofs);
+            return res.status(200).json(verifiedProofs);
+        })();
+    });
+
     app.post('/api/proofs', function (req, res, next) {
         const body = req.body;
         const deliveryIds = body.deliveryIds;
