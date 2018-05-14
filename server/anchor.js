@@ -53,21 +53,22 @@ const library = (function () {
         });
 
         // Submit each hash to three randomly selected Nodes
-        let proofHandles = await chp.submitHashes(hashes)
+        let proofHandles = await chp.submitHashes(hashes);
         // console.log("Submitted Proof Objects: Expand objects below to inspect.")
         // console.log(proofHandles)
 
         // Wait for Calendar proofs to be available
         let proofs = [];
         let attempts = 0;
-        while(proofs.length == 0) {
+        while(proofs.length === 0) {
             console.log("Sleeping 12 seconds to wait for proofs to generate before doing proof table insertion");
-            await new Promise(resolve => setTimeout(resolve, 12000))
+            await new Promise(resolve => setTimeout(resolve, 12000));
             // Calendar proofs from Tierion should now be ready.
             try {
                 proofs = await chp.getProofs(proofHandles)
             } catch (err) {
                 console.log('caught error getting proofs', err);
+                proofs = [];
                 attempts += 1;
                 if (attempts < 3) {
                     console.log('retrying...')
